@@ -14,6 +14,7 @@ using std::shared_ptr;
 
 // TODO: Needs to be Debugged!
 // TODO: Create some main function so that we can use these header files.
+// TODO: Need to create the rendering engine for this using a library.
 
 class hittable_list : public hittable {
 
