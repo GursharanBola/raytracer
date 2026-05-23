@@ -12,10 +12,6 @@
 using std::make_shared;
 using std::shared_ptr;
 
-// TODO: Needs to be Debugged!
-// TODO: Create some main function so that we can use these header files.
-// TODO: Need to create the rendering engine for this using a library.
-
 class hittable_list : public hittable {
 
     // We need to find a way to add and remove objects from the list
@@ -32,15 +28,15 @@ class hittable_list : public hittable {
     }
 
     void add(shared_ptr<hittable> item) {
-        if (item == NULL) {
+        if (item == nullptr) {
             return;
         }
         this->objects.push_back(item);
     }
 
-    /* only return the closest item since everything after that doesn't matter
-     */
-    bool hit(const ray &r, double ray_tmin, double ray_tmax, hit_record &rec) {
+    /* only return the closest since ray cannot pass through other items */
+    bool hit(const ray &r, double ray_tmin, double ray_tmax,
+             hit_record &rec) const override {
 
         // TODO: We will come back to this list so that we determine quickly
         // whether or not we need to actually some objects.
@@ -60,4 +56,5 @@ class hittable_list : public hittable {
         return did_hit;
     }
 };
+
 #endif
