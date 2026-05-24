@@ -9,9 +9,6 @@
 #include <array>
 #include <cstdint>
 
-// TODO: Create some main function so that we can use these header files.
-// TODO: Need to create the rendering engine for this using a library.
-
 class img {
   public:
     static constexpr int width = 800;
@@ -33,8 +30,7 @@ class img {
             return vec3(0, 0, 0);
         }
 
-        int row_size = 3 * width;
-        int index = (3 * x) + (y * row_size);
+        int index = (3 * x) + 3 * width * y;
 
         return vec3(image_buffer[index] / 255.0,
                     image_buffer[index + 1] / 255.0,
