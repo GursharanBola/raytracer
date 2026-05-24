@@ -101,4 +101,6 @@ inline double distance(const vec3 v1, const vec3 v2) {
     return (v2 - v1).length();
 }
 
+inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
+
 #endif

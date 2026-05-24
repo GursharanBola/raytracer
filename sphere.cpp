@@ -10,7 +10,8 @@ class sphere : public hittable {
     sphere(const vec3 &center, double radius)
         : center(center), radius(std::fmax(0, radius)) {}
 
-    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) {
+    bool hit(const ray &r, double t_min, double t_max,
+             hit_record &rec) const override {
         vec3 oc = center - r.origin();
         auto a = r.direction().length_squared();
         auto h = dot(r.direction(), oc);
@@ -24,7 +25,8 @@ class sphere : public hittable {
             return false;
         }
 
-        // check if we are in range and if so which ones are valid.
+        // check if we are in range and if so which ones are valid checking
+        // closest first
         auto root = (h - sqrt_deter) / a;
         if (root <= t_min || t_max <= root) {
             root = (h + sqrt_deter) / a;
