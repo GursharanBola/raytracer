@@ -122,7 +122,36 @@ class camera {
         }
         return avg_color / num_samples;
     }
-    vec3 average_pixel_linear() const { return vec3{0, 0, 0}; }
+    vec3 average_pixel_linear(int i, int j, double screen_z,
+                              const hittable_list &world, int num_samples,
+                              vec3 camera_center, int image_width,
+                              int image_height) const {
+        vec3 avg_color = vec3{0, 0, 0};
+
+        double aspect_ratio = (double)image_width / image_height;
+
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dis(-0.5, 0.5);
+
+        for (int k = 0; k < num_samples; k++) {
+
+            double jit_i = i + dis(gen);
+            double jit_j = j + dis(gen);
+
+            double jit_screen_x =
+                ((jit_j / (image_width - 1)) * 2.0 - 1.0) * aspect_ratio;
+            double jit_screen_y = (jit_i / (image_height - 1)) * 2.0 - 1.0;
+
+            vec3 jittered_dir = vec3{jit_screen_x, jit_screen_y, screen_z};
+
+            ray jittered_ray = ray(camera_center, unit_vector(jittered_dir));
+
+            avg_color += color(jittered_ray, world);
+        }
+
+        return avg_color / num_samples;
+    }
     vec3 color(const ray r, const hittable_list &world) const {
         return vec3{0, 0, 0};
     }
