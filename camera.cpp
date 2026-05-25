@@ -59,7 +59,9 @@ class camera {
                         i, j, delta_theta, delta_phi, start_ver_cir, world,
                         aliasing_samples, center);
 
-                    image.set_color(j, i, average_color);
+                    image.set_color(j, i,
+                                    average_color); // TODO: maybe check if
+                                                    // set_color() fails.
                 }
             }
             break;
