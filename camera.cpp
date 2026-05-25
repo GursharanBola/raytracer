@@ -154,6 +154,10 @@ class camera {
 
         return avg_color / num_samples;
     }
+
+    // TODO: Next to impliment. Need to add meta data to hittables for sufrace
+    // type. Need to make subroutines for each surface type.
+
     vec3 color(const ray r, const hittable_list &world) const {
         return vec3{0, 0, 0};
     }
