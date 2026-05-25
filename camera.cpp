@@ -39,25 +39,24 @@ class camera {
         int t_max = 100;
         int t_min = 0;
 
-        int aliasing_samples = 3;
+        int aaliasing_samples = 3;
 
         switch (camera_type) {
         case CAMERA_SPHERICAL: {
             double delta_theta = pi / (image_height - 1);
             double delta_phi = (2 * pi) / (image_width - 1);
             vec3 start_ver_cir = vec3{0, focal_length, 0};
-            vec3 start_hor_cir =
-                vec3{start_ver_cir.vec[2], start_ver_cir.vec[1], 0.0};
 
             for (int i = 0; i < image_height; i++) {
                 vec3 curr_ver_cir = start_ver_cir.rotate_x(delta_theta * i);
 
                 for (int j = 0; j < image_width; j++) {
 
-                    vec3 curr_hor_cir = start_hor_cir.rotate_y(delta_phi * j);
-                    ray r = ray(center, unit_vector(curr_hor_cir - center));
+                    vec3 curr_hor_cir = curr_ver_cir.rotate_y(delta_phi * j);
+                    ray parent_r = ray(center, unit_vector(curr_hor_cir));
 
-                    // NOTE: call color() here
+                    vec3 average_color = average_pixel_sphere(parent_r, world);
+                    image.set_color(j, i, average_color);
                 }
             }
             break;
@@ -88,5 +87,13 @@ class camera {
         }
         }
     }
+    // This is adding noise on the angle we are sampling that is why this
+    // differs from the linear option
+    vec3 average_pixel_sphere(const ray parent_ray,
+                              const hittable_list &world, ) const {
+        return vec3{0, 0, 0};
+    }
+    vec3 color(ray r, hittable_list &world) const { return vec3{0, 0, 0}; }
 };
+
 #endif
