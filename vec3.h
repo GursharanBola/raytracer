@@ -66,6 +66,20 @@ class vec3 {
                this->vec[2] * this->vec[2];
     }
     double length() const { return std::sqrt(this->length_squared()); }
+
+    // rotation based on x coming out of the page, y being vertical and z
+    // following the right hand rule.
+    vec3 rotate_y(double angle) const {
+        double c = std::cos(angle);
+        double s = std::sin(angle);
+        return vec3{vec[0] * c + vec[2] * s, vec[1], -vec[0] * s + vec[2] * c};
+    }
+
+    vec3 rotate_x(double angle) const {
+        double c = std::cos(angle);
+        double s = std::sin(angle);
+        return vec3{vec[0], vec[1] * c - vec[2] * s, vec[1] * s + vec[2] * c};
+    }
 };
 
 inline vec3 operator-(const vec3 &u, const vec3 &v) {

@@ -9,11 +9,11 @@
 #include <vector>
 
 /**
- * Although the camera is what decides how we look at our scene we should also
- * put decide that this is where of what type of focal plane, spherical,
- * cylindrical, or maybe even a custom functionality, where we can input a
- * function.
- *
+ * For this project the camera type will determine the rendering that we will
+ * see the render() function will render the objects by calling color() as a
+ * subroutine. color() will take in a ray, and return the color of the
+ * associated pixel given a world. color() will take into account the
+ * surface_type which is given in the METADATA of the object type.
  */
 
 class camera {
@@ -33,18 +33,20 @@ class camera {
     void render(const hittable_list &world, int image_width, int image_height) {
         img image = img{}; // create a width 800, height 600 image with 3 8 bit
                            // channels.
+
+        // NOTE: These are the intervals we can adjust to determine the depth of
+        // the ray
         int t_max = 100;
         int t_min = 0;
+
         switch (camera_type) {
         case CAMERA_SPHERICAL: {
-            vec3 curr_ver_cir =
-                vec3{0, focal_length, 0}; // start at the top of the sphere
+            vec3 curr_ver_cir = vec3{0, focal_length, 0};
             double delta_theta = pi / (image_height - 1);
             double delta_phi = (2 * pi) / (image_width - 1);
 
             for (int i = 0; i < image_height; i++) {
 
-                double x_k = curr_ver_cir.vec[0];
                 double y_k = curr_ver_cir.vec[1];
                 double z_k = curr_ver_cir.vec[2];
 
@@ -55,27 +57,13 @@ class camera {
                     // NOTE: call color() here which will take in the ray
                     // and return the color that we are looking for.
 
-                    double x_k = curr_hor_cir.vec[0];
-                    double y_k = curr_hor_cir.vec[1];
-                    double z_k = curr_hor_cir.vec[2];
-
-                    double x_next =
-                        x_k * std::cos(delta_phi) - z_k * std::sin(delta_phi);
-                    double z_next =
-                        x_k * std::sin(delta_phi) + z_k * std::cos(delta_phi);
-
-                    curr_hor_cir = vec3{x_next, y_k, z_next};
+                    curr_hor_cir = curr_hor_cir.rotate_y(delta_phi);
                 }
-                double y_next =
-                    y_k * std::cos(delta_theta) - z_k * std::sin(delta_theta);
-                double z_next =
-                    y_k * std::sin(delta_theta) + z_k * std::cos(delta_theta);
 
-                curr_ver_cir = vec3{0.0, y_next, z_next};
+                curr_ver_cir = curr_ver_cir.rotate_x(delta_theta);
             }
             break;
         }
-
         case CAMERA_FLAT: {
             double aspect_ratio = (double)image_width / image_height;
             for (int i = 0; i < image_height; i++) {
@@ -104,6 +92,5 @@ class camera {
         }
         }
     }
-    inline void color() { return; }
 };
 #endif
