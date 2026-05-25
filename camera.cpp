@@ -6,6 +6,7 @@
 #include "vec3.h"
 #include <cmath>
 #include <iostream>
+#include <random>
 #include <vector>
 
 /**
@@ -39,7 +40,7 @@ class camera {
         int t_max = 100;
         int t_min = 0;
 
-        int aaliasing_samples = 3;
+        int aliasing_samples = 3;
 
         switch (camera_type) {
         case CAMERA_SPHERICAL: {
@@ -53,9 +54,11 @@ class camera {
                 for (int j = 0; j < image_width; j++) {
 
                     vec3 curr_hor_cir = curr_ver_cir.rotate_y(delta_phi * j);
-                    ray parent_r = ray(center, unit_vector(curr_hor_cir));
 
-                    vec3 average_color = average_pixel_sphere(parent_r, world);
+                    vec3 average_color = average_pixel_angular(
+                        i, j, delta_theta, delta_phi, start_ver_cir, world,
+                        aliasing_samples, center);
+
                     image.set_color(j, i, average_color);
                 }
             }
@@ -89,11 +92,38 @@ class camera {
     }
     // This is adding noise on the angle we are sampling that is why this
     // differs from the linear option
-    vec3 average_pixel_sphere(const ray parent_ray,
-                              const hittable_list &world, ) const {
+    vec3 average_pixel_angular(int i, int j, double delta_theta,
+                               double delta_phi, const vec3 &start_ver_cir,
+                               const hittable_list &world, int num_samples,
+                               vec3 camera_center) const {
+
+        vec3 avg_color = vec3{0, 0, 0};
+
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dis(-0.5, 0.5);
+
+        for (int k = 0; k < num_samples; k++) {
+
+            double random_t = dis(gen);
+            double random_p = dis(gen);
+            double jit_theta = delta_theta * (i + random_t);
+            double jit_phi = delta_phi * (j + random_p);
+
+            vec3 jittered_dir =
+                start_ver_cir.rotate_x(jit_theta).rotate_y(jit_phi);
+
+            ray jittered_ray = ray(camera_center, jittered_dir);
+            vec3 sample_color = color(jittered_ray, world);
+
+            avg_color += sample_color;
+        }
+        return avg_color / num_samples;
+    }
+    vec3 average_pixel_linear() const { return vec3{0, 0, 0}; }
+    vec3 color(const ray r, const hittable_list &world) const {
         return vec3{0, 0, 0};
     }
-    vec3 color(ray r, hittable_list &world) const { return vec3{0, 0, 0}; }
 };
 
 #endif
