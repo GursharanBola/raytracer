@@ -82,16 +82,18 @@ class camera {
                     vec3 screen_point = vec3{screen_x, screen_y, screen_z};
                     vec3 dir = unit_vector(screen_point - center);
 
-                    ray r = ray(center, dir);
+                    vec3 avg_color = average_pixel_linear(
+                        i, j, screen_z, world, aliasing_samples, center,
+                        image_width, image_height);
 
-                    // NOTE: call color() here which will take in the ray
-                    // and return the color that we are looking for.
+                    image.set_color(j, i, avg_color);
                 }
             }
             break;
         }
         }
     }
+
     // This is adding noise on the angle we are sampling that is why this
     // differs from the linear option
     vec3 average_pixel_angular(int i, int j, double delta_theta,
