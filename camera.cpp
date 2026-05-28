@@ -160,7 +160,7 @@ class camera {
     // TODO: Next to impliment and refine.
 
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
-               double ray_tmax) const {
+               double ray_tmax, int depth) const {
         hit_record rec;
         if (world.hit(r, ray_tmin, ray_tmax, rec)) {
             return vec3{1, 1, 1};
@@ -172,7 +172,7 @@ class camera {
         ray new_ray = ray(rec.point, new_dir);
 
         return elem_mul(rec.mat->color,
-                        color(new_ray, world, ray_tmin, ray_tmax));
+                        color(new_ray, world, ray_tmin, ray_tmax, depth - 1));
     }
 };
 
