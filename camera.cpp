@@ -1,8 +1,10 @@
 #ifndef CAMERA
 #define CAMERA
 
+#include "hittable.h"
 #include "hittable_list.h"
 #include "img.h"
+#include "material.h"
 #include "vec3.h"
 #include <cmath>
 #include <iostream>
@@ -155,17 +157,22 @@ class camera {
         return avg_color / num_samples;
     }
 
-    // TODO: Next to impliment. Need to add meta data to hittables for sufrace
-    // type. Need to make subroutines for each surface type.
+    // TODO: Next to impliment.
 
-    // TODO: Fix lines that call color() by adding necessary information.
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
                double ray_tmax) const {
-        vec3 color = vec3{0, 0, 0};
         hit_record rec;
-        world.hit(r, ray_tmin, ray_tmax, rec);
+        if (world.hit(r, ray_tmin, ray_tmax, rec)) {
+            return vec3{1, 1, 1};
+        }
+        // NOTE: bounce() always returns the a normal vector AT the point of
+        // intersection
+        vec3 new_dir =
+            rec.mat->bounce(rec.point, rec.normal, world, r.direction());
+        ray new_ray = ray(rec.point, new_dir);
 
-        return color;
+        return elem_mul(rec.mat->color,
+                        color(new_ray, world, ray_tmin, ray_tmax));
     }
 };
 

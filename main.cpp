@@ -7,7 +7,5 @@
 #include "sphere.cpp"
 #include "vec3.h"
 
-#include <iostream>
-#include <memory>
 
 int main() {}

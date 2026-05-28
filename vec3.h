@@ -42,11 +42,6 @@ class vec3 {
                (v1.vec[2] == v2.vec[2]);
     }
 
-    vec3 elem_mul(vec3 v1, vec3 v2) {
-        return vec3(v1.vec[0] * v2.vec[0], v1.vec[1] * v2.vec[1],
-                    v1.vec[2] * v2.vec[2]);
-    }
-
     double elem_sum(const vec3 v) { return v.vec[0] + v.vec[1] + v.vec[2]; }
 
     vec3 cross(const vec3 &v1, const vec3 &v2) {
@@ -133,6 +128,10 @@ inline double random_double(double min, double max) {
 inline vec3 random_vec3(double min, double max) {
     return vec3(random_double(min, max), random_double(min, max),
                 random_double(min, max));
+}
+inline vec3 elem_mul(vec3 v1, vec3 v2) {
+    return vec3(v1.vec[0] * v2.vec[0], v1.vec[1] * v2.vec[1],
+                v1.vec[2] * v2.vec[2]);
 }
 
 #endif

@@ -10,7 +10,6 @@ class sphere : public hittable {
     sphere(const vec3 &center, double radius, std::shared_ptr<material> mat)
         : center(center), radius(std::fmax(0, radius)), mat(mat) {}
 
-    // TODO: Return material of the sphere that we have hit.
     bool hit(const ray &r, double t_min, double t_max,
              hit_record &rec) const override {
         vec3 oc = center - r.origin();
@@ -44,8 +43,8 @@ class sphere : public hittable {
         rec.mat = mat;
         return true;
     }
-    vec3 get_center() { return center; }
-    double get_radius() { return radius; }
+    vec3 get_center() const { return center; }
+    double get_radius() const { return radius; }
 
   private:
     vec3 center;
