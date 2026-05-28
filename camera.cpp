@@ -22,13 +22,18 @@
 class camera {
   public:
     vec3 center;
-
+    vec3 cam_u;
+    vec3 cam_v;
+    vec3 cam_w;
     enum CameraType { CAMERA_FLAT = 0, CAMERA_SPHERICAL = 1 };
     CameraType camera_type;
     double focal_length;
     double pi = 3.1415926535897932;
-    camera(const vec3 &camera_center, CameraType type, double f_length = 1.0)
-        : center(camera_center), camera_type(type), focal_length(f_length) {}
+    camera(const vec3 &camera_center, CameraType type, double f_length = 1.0,
+           vec3 u_axis = vec3(1, 0, 0), vec3 v_axis = vec3(0, 1, 0),
+           vec3 w_axis = vec3(0, 0, 1))
+        : center(camera_center), camera_type(type), focal_length(f_length),
+          cam_u(u_axis), cam_v(v_axis), cam_w(w_axis) {}
 
     // NOTE: This is for varied image sizes which isn't supported yet so we
     // should stick to inputting image_width and img_height as it is hard coded
@@ -45,6 +50,7 @@ class camera {
         int aliasing_samples = 3;
 
         switch (camera_type) {
+        // TODO: Handle rotating the sphere for sampling.
         case CAMERA_SPHERICAL: {
             double delta_theta = pi / (image_height - 1);
             double delta_phi = (2 * pi) / (image_width - 1);
@@ -68,6 +74,8 @@ class camera {
             }
             break;
         }
+        // TODO: Handle angling the plane for the angle that we are looking at
+        // the scene with.
         case CAMERA_FLAT: {
             double aspect_ratio = (double)image_width / image_height;
             for (int i = 0; i < image_height; i++) {
@@ -113,13 +121,15 @@ class camera {
      * random vector that is within the correct radius of the appeture.
      */
 
-    // This is adding noise on the angle we are sampling that is why this
-    // differs from the linear option
+    // NOTE: This is supporting anti-aliasing for spherical lenses WIHTOUT
+    // rotation
+
+    // TODO: Support sub_pixel jittering WITH angleing the sphere.
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi, const vec3 &start_ver_cir,
                                const hittable_list &world, int num_samples,
-                               vec3 camera_center,
-                               double aperture_radius) const {
+                               vec3 camera_center, vec3 cam_u, vec3 cam_v,
+                               vec3 cam_w) const {
 
         vec3 avg_color = vec3{0, 0, 0};
 
@@ -138,15 +148,6 @@ class camera {
             vec3 jittered_dir =
                 start_ver_cir.rotate_x(jit_theta).rotate_y(jit_phi);
 
-            // NOTE: This is the bokeh
-            // Rejection sampling
-            vec3 aperture_start =
-                random_vec3(-aperture_radius, aperture_radius);
-            while (dot(aperture_start, aperture_start) >
-                   aperture_radius * aperture_radius) {
-            }
-
-            // NOTE: This is actually getting the color.
             ray jittered_ray = ray(camera_center, jittered_dir);
             vec3 sample_color = color(jittered_ray, world);
 
@@ -154,6 +155,8 @@ class camera {
         }
         return avg_color / num_samples;
     }
+
+    // NOTE:
     vec3 average_pixel_linear(int i, int j, double screen_z,
                               const hittable_list &world, int num_samples,
                               vec3 camera_center, int image_width,
@@ -208,9 +211,14 @@ class camera {
             return (1 - normalized_y) * white + light_blue * normalized_y;
         }
 
-        // NOTE: bounce() must always return the a normal vector AT the point
-        // of intersection in order to work.
+        // NOTE: bounce() must always return the direction.
         vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction());
+        double s = 1e-8; // check for dead rays.
+        if ((std::fabs(new_dir.vec[0]) < s) &&
+            (std::fabs(new_dir.vec[1]) < s) &&
+            (std::fabs(new_dir.vec[2]) < s)) {
+            return vec3{0, 0, 0};
+        }
         ray new_ray = ray(rec.point, new_dir);
 
         return elem_mul(rec.mat->color,
