@@ -157,7 +157,7 @@ class camera {
         return avg_color / num_samples;
     }
 
-    // TODO: Next to impliment.
+    // TODO: Next to impliment and refine.
 
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
                double ray_tmax) const {
