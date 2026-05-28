@@ -3,10 +3,12 @@
 #include "ray.h"
 #include "vec3.h"
 
+#include <memory>
+
 class sphere : public hittable {
   public:
-    sphere(const vec3 &center, double radius)
-        : center(center), radius(std::fmax(0, radius)) {}
+    sphere(const vec3 &center, double radius, std::shared_ptr<material> mat)
+        : center(center), radius(std::fmax(0, radius)), mat(mat) {}
 
     // TODO: Return material of the sphere that we have hit.
     bool hit(const ray &r, double t_min, double t_max,
@@ -39,6 +41,7 @@ class sphere : public hittable {
         rec.normal = (rec.point - center) / radius;
         vec3 outward_normal = (rec.point - center) / radius;
         rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
         return true;
     }
     vec3 get_center() { return center; }
@@ -47,4 +50,5 @@ class sphere : public hittable {
   private:
     vec3 center;
     double radius;
+    std::shared_ptr<material> mat;
 };
