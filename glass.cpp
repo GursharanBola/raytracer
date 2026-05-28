@@ -13,7 +13,6 @@ class glass_surface : public material {
         refrac_index = refractive_index;
     }
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
-                const hittable_list &world,
                 const vec3 ray_direction) const override {
 
         return vec3{0, 0, 0};
