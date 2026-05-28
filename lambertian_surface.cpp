@@ -3,19 +3,24 @@
 
 #include "material.h"
 #include "vec3.h"
+#include <cmath>
 
 class lambertian_surface : public material {
   public:
-    lambertian_surface();
+    lambertian_surface(vec3 L_surface_color) { color = L_surface_color; }
+
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                 const hittable_list &world) const override {
-        vec3 res = random_vec3();
+        int radius = 1;
+        vec3 res = random_vec3(-radius, radius);
 
-        while () {
+        while (dot(res, res) > 1 || dot(normal, res) < 0) {
+            res = random_vec3(-radius, radius);
         }
 
-        return res;
+        vec3 bounce_direction = normal + res;
+
+        return bounce_direction / bounce_direction.length();
     }
 };
-
 #endif
