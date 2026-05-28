@@ -157,7 +157,8 @@ class camera {
         return avg_color / num_samples;
     }
 
-    // TODO: Next to impliment and refine.
+    // NOTE: ray_tmin and ray_tmax should be somethig around 0.001, infinity
+    // So that we can no shadow acne, but again that is up the user
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
                double ray_tmax, int depth) const {
         if (depth <= 0) {
@@ -178,8 +179,8 @@ class camera {
             return (1 - normalized_y) * white + light_blue * normalized_y;
         }
 
-        // NOTE: bounce() always returns the a normal vector AT the point of
-        // intersection
+        // NOTE: bounce() must always returns the a normal vector AT the point
+        // of intersection in order to work.
         vec3 new_dir =
             rec.mat->bounce(rec.point, rec.normal, world, r.direction());
         ray new_ray = ray(rec.point, new_dir);
