@@ -22,9 +22,9 @@ class metal_surface : public material {
         while (dot(fuzz, fuzz) > radius * radius) {
             fuzz = random_vec3(-radius, radius);
         }
-        res = res + hit_location + fuzz;           // this is a spatial vector.
-        if (dot(res - hit_location, normal) > 0) { // this is direction vector.
-            return res;
+        res = res + fuzz;
+        if (dot(res, normal) > 0) {
+            return res / res.length();
         } else {
             return vec3{0, 0, 0};
         }

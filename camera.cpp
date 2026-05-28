@@ -96,12 +96,30 @@ class camera {
         }
     }
 
+    /*
+    ** If I want bokeh I should have a lens in between the focal plane. Now we
+    * have an ideal pin hole camera
+    ** that reads the focal plane.
+    ** For each point on lens, we sample the entire scene so for each part of
+    * the lens we get an image of the scene
+    * from that perspective. We do this for all points on the lens and then
+    * return the average of the colors. If we want this to work
+    * quickly we just take a representive sample instead of perfect recreation,
+    * this is just monte-carlo approximation.
+    */
+
+    /* Right now, I will stick with aperture's that are completely circular
+     * That means we have to do some rejection sampling so that we can get
+     * random vector that is within the correct radius of the appeture.
+     */
+
     // This is adding noise on the angle we are sampling that is why this
     // differs from the linear option
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi, const vec3 &start_ver_cir,
                                const hittable_list &world, int num_samples,
-                               vec3 camera_center) const {
+                               vec3 camera_center,
+                               double aperture_radius) const {
 
         vec3 avg_color = vec3{0, 0, 0};
 
@@ -111,6 +129,7 @@ class camera {
 
         for (int k = 0; k < num_samples; k++) {
 
+            // NOTE: This is the subpixel jittering
             double random_t = dis(gen);
             double random_p = dis(gen);
             double jit_theta = delta_theta * (i + random_t);
@@ -119,6 +138,15 @@ class camera {
             vec3 jittered_dir =
                 start_ver_cir.rotate_x(jit_theta).rotate_y(jit_phi);
 
+            // NOTE: This is the bokeh
+            // Rejection sampling
+            vec3 aperture_start =
+                random_vec3(-aperture_radius, aperture_radius);
+            while (dot(aperture_start, aperture_start) >
+                   aperture_radius * aperture_radius) {
+            }
+
+            // NOTE: This is actually getting the color.
             ray jittered_ray = ray(camera_center, jittered_dir);
             vec3 sample_color = color(jittered_ray, world);
 
@@ -129,7 +157,7 @@ class camera {
     vec3 average_pixel_linear(int i, int j, double screen_z,
                               const hittable_list &world, int num_samples,
                               vec3 camera_center, int image_width,
-                              int image_height) const {
+                              int image_height, double aperture_radius) const {
         vec3 avg_color = vec3{0, 0, 0};
 
         double aspect_ratio = (double)image_width / image_height;
@@ -180,7 +208,7 @@ class camera {
             return (1 - normalized_y) * white + light_blue * normalized_y;
         }
 
-        // NOTE: bounce() must always returns the a normal vector AT the point
+        // NOTE: bounce() must always return the a normal vector AT the point
         // of intersection in order to work.
         vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction());
         ray new_ray = ray(rec.point, new_dir);
