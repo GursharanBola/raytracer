@@ -4,7 +4,7 @@
 #include "hittable_list.h"
 #include "img.h"
 #include "ray.h"
-#include "sphere.h"
+#include "sphere.cpp"
 #include "vec3.h"
 
 #include <iostream>
