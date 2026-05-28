@@ -3,7 +3,6 @@
 
 #include "material.h"
 #include "vec3.h"
-#include <cmath>
 
 class lambertian_surface : public material {
   public:
