@@ -157,6 +157,7 @@ class camera {
         return avg_color / num_samples;
     }
 
+    // TODO: Impliment lighting and see how they can be rendered on a scene.
     // NOTE: ray_tmin and ray_tmax should be somethig around 0.001, infinity
     // So that we can no shadow acne, but again that is up the user
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
