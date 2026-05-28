@@ -11,12 +11,11 @@ class lambertian_surface : public material {
         color = material_color;
     }
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
-                const hittable_list &world,
                 const vec3 ray_direction) const override {
         int radius = 1;
         vec3 res = random_vec3(-radius, radius);
 
-        while (dot(res, res) > 1 || dot(normal, res) < 0) {
+        while (dot(res, res) > radius || dot(normal, res) < 0) {
             res = random_vec3(-radius, radius);
         }
 

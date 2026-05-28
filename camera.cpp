@@ -182,8 +182,7 @@ class camera {
 
         // NOTE: bounce() must always returns the a normal vector AT the point
         // of intersection in order to work.
-        vec3 new_dir =
-            rec.mat->bounce(rec.point, rec.normal, world, r.direction());
+        vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction());
         ray new_ray = ray(rec.point, new_dir);
 
         return elem_mul(rec.mat->color,
