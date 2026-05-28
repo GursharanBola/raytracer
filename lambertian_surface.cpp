@@ -7,7 +7,9 @@
 class lambertian_surface : public material {
   public:
     // It must be that we send in the color before we make the item.
-    lambertian_surface(vec3 material_color) { color = material_color; }
+    lambertian_surface(vec3 material_color, double absorbed) {
+        color = material_color;
+    }
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                 const hittable_list &world,
                 const vec3 ray_direction) const override {

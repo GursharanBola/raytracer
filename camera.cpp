@@ -158,13 +158,26 @@ class camera {
     }
 
     // TODO: Next to impliment and refine.
-
     vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
                double ray_tmax, int depth) const {
-        hit_record rec;
-        if (world.hit(r, ray_tmin, ray_tmax, rec)) {
-            return vec3{1, 1, 1};
+        if (depth <= 0) {
+            return vec3{0, 0, 0}; // shadows are dark
         }
+
+        hit_record rec;
+        if (!world.hit(r, ray_tmin, ray_tmax, rec)) {
+            vec3 u_dir = r.direction() / r.direction().length();
+            // NOTE: If you want to change the background color then we change
+            // it here: For now the setting is OUTSIDE, that is under natural
+            // sky.
+            vec3 light_blue = vec3{0, 0, 0.5};
+            vec3 white = vec3{.9, .9, .9};
+
+            double normalized_y = 0.5 * (u_dir.y() + 1.0);
+
+            return (1 - normalized_y) * white + light_blue * normalized_y;
+        }
+
         // NOTE: bounce() always returns the a normal vector AT the point of
         // intersection
         vec3 new_dir =

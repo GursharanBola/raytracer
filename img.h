@@ -9,6 +9,12 @@
 #include <array>
 #include <cstdint>
 
+/**
+ * Colors are rendered from [0,1] only internally are they actually represented
+ * as 8 bit with channels, colors in this way is clever for later functions.
+ * This idea was takent from RIOW.
+ */
+
 class img {
   public:
     static constexpr int width = 800;
