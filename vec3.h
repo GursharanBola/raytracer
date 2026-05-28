@@ -4,6 +4,7 @@
 // Some standard libraries
 #include <cmath>
 #include <iostream>
+#include <random>
 #include <vector>
 
 class vec3 {
@@ -116,5 +117,22 @@ inline double distance(const vec3 v1, const vec3 v2) {
 }
 
 inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
+
+inline double random_double() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator;
+    return distribution(generator);
+}
+
+inline double random_double(double min, double max) {
+    static std::uniform_real_distribution<double> distribution(min, max);
+    static std::mt19937 generator;
+    return distribution(generator);
+}
+
+inline vec3 random_vec3(double min, double max) {
+    return vec3(random_double(min, max), random_double(min, max),
+                random_double(min, max));
+}
 
 #endif

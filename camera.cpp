@@ -158,8 +158,14 @@ class camera {
     // TODO: Next to impliment. Need to add meta data to hittables for sufrace
     // type. Need to make subroutines for each surface type.
 
-    vec3 color(const ray r, const hittable_list &world) const {
-        return vec3{0, 0, 0};
+    // TODO: Fix lines that call color() by adding necessary information.
+    vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
+               double ray_tmax) const {
+        vec3 color = vec3{0, 0, 0};
+        hit_record rec;
+        world.hit(r, ray_tmin, ray_tmax, rec);
+
+        return color;
     }
 };
 

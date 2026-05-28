@@ -1,15 +1,14 @@
 #include "hittable.h"
+#include "material.h"
 #include "ray.h"
 #include "vec3.h"
-#include <iostream>
-#include <type_traits>
-#include <vector>
 
 class sphere : public hittable {
   public:
     sphere(const vec3 &center, double radius)
         : center(center), radius(std::fmax(0, radius)) {}
 
+    // TODO: Return material of the sphere that we have hit.
     bool hit(const ray &r, double t_min, double t_max,
              hit_record &rec) const override {
         vec3 oc = center - r.origin();
@@ -42,6 +41,8 @@ class sphere : public hittable {
         rec.set_face_normal(r, outward_normal);
         return true;
     }
+    vec3 get_center() { return center; }
+    double get_radius() { return radius; }
 
   private:
     vec3 center;
