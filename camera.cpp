@@ -30,23 +30,25 @@ class camera {
     double focal_length;
     double pi = 3.1415926535897932;
     double focal_dist;
+    double apeture_radius = 0.5;
+    double t_max;
+    double t_min;
     camera(const vec3 &camera_center, CameraType type, double f_dist,
-           double f_length = 1.0, vec3 u_axis = vec3(1, 0, 0),
-           vec3 v_axis = vec3(0, 1, 0), vec3 w_axis = vec3(0, 0, 1))
-        : center(camera_center), camera_type(type), focal_length(f_length),
-          cam_u(u_axis), cam_v(v_axis), cam_w(w_axis), focal_dist(f_dist) {}
+           double tray_max = std::numeric_limits<double>::max(),
+           double tray_min = 0.001, double f_length = 1.0,
+           vec3 u_axis = vec3(1, 0, 0), vec3 v_axis = vec3(0, 1, 0),
+           vec3 w_axis = vec3(0, 0, 1))
+        : center(camera_center), cam_u(u_axis), cam_v(v_axis), cam_w(w_axis),
+          camera_type(type), focal_length(f_length), focal_dist(f_dist),
+          t_max(tray_max), t_min(tray_min) {}
 
     // NOTE: This is for varied image sizes which isn't supported yet so we
     // should stick to inputting image_width and img_height as it is hard coded
     // int the img headerfile.
-    void render(const hittable_list &world, int image_width, int image_height) {
+    void render(const hittable_list &world, int image_width, int image_height,
+                double t_max, double t_min) {
         img image = img{}; // create a width 800, height 600 image with 3 8 bit
                            // channels.
-
-        // NOTE: These are the intervals we can adjust to determine the depth of
-        // the ray
-        int t_max = 100;
-        int t_min = 0;
 
         int aliasing_samples = 3;
 
@@ -69,20 +71,17 @@ class camera {
                         i, j, delta_theta, delta_phi, start_ver_cir, world,
                         aliasing_samples, center, cam_u, cam_v, cam_w);
 
-                    image.set_color(j, i,
-                                    average_color); // TODO: maybe check if
-                                                    // set_color() fails.
+                    image.set_color(
+                        j, i,
+                        average_color); // TODO: check if set_color() fails.
                 }
             }
             break;
         }
-        // TODO: Handle angling the plane for the angle that we are looking at
-        // the scene with.
         case CAMERA_FLAT: {
             double aspect_ratio = (double)image_width / image_height;
             for (int i = 0; i < image_height; i++) {
                 for (int j = 0; j < image_width; j++) {
-                    double apeture_radius = 0.5;
 
                     vec3 avg_color = average_pixel_linear(
                         i, j, world, aliasing_samples, image_width,
@@ -95,20 +94,7 @@ class camera {
             break;
         }
         }
-        // TODO: OPTIONAL: Create a Fisheye a large cut out of a sphere
     }
-
-    /*------------------------------- DESIGN -----------------------------*/
-    /*  Bokeh, camera rotation, and antialiasing is supported for flat sensors.
-     * In order to do this in, average_pixel_linear() I will jitter start of the
-     * shooting ray to be within a disk (standard x^2 +y^2 = 1) and then rotate
-     * it: pitch, yaw, and roll by doing the opperation one Line 140 and adding
-     * it to the start of the ray.
-     *
-     * Antialiasing will be done by doing sub_pixel jittering (i +- .5 and j +-
-     * .5) and sampling multiple times. Notice that we are doing both
-     * opperations at the same time i.e.: O(s) time.
-     */
 
     // NOTE: This is supporting anti-aliasing and works for spherical lenses
     // That CAN be rotated. Bokeh is not supported for spherical lenses.
@@ -126,7 +112,6 @@ class camera {
 
         for (int k = 0; k < num_samples; k++) {
 
-            // NOTE: This is the subpixel jittering
             double random_t = dis(gen);
             double random_p = dis(gen);
             double jit_theta = delta_theta * (i + random_t);
@@ -147,17 +132,17 @@ class camera {
             double t_min = 0.0001;
             double t_max = std::numeric_limits<double>::max();
 
-            int depth = 10;
+            int depth = 10; // limit to 10 bounces.
 
-            vec3 sample_color = color(jittered_ray, world, t_min, t_max, depth);
+            vec3 sample_color = color(jittered_ray, world, depth);
 
             avg_color += sample_color;
         }
         return avg_color / num_samples;
     }
 
-    // TODO: Support sub_pixel jittering as well as bokeh WITH angled focal
-    // plane.
+    // NOTE: Flat lenses do have Bokeh, Anti Aliasing, can be rotated, and
+    // shifted.
     vec3 average_pixel_linear(int i, int j, const hittable_list &world,
                               int num_samples, int image_width,
                               int image_height, double aperture_radius,
@@ -182,10 +167,6 @@ class camera {
             double jit_screen_x = (2.0 * percent_x - 1.0) * aspect_ratio;
             double jit_screen_y = -(2.0 * percent_y - 1.0);
 
-            vec3 rotated_and_jittered_dir = (jit_screen_x * cam_u) +
-                                            (jit_screen_y * cam_v) +
-                                            (-focal_length * cam_w);
-
             // NOTE: Bokeh vvv
             vec3 random_unit_disk =
                 random_vec3(-aperture_radius, aperture_radius);
@@ -200,38 +181,36 @@ class camera {
 
             double inter_p = focal_dist / focal_length;
 
-            vec3 P_focus = (jit_screen_x * inter_p * cam_u) +
-                           (jit_screen_y * inter_p * cam_v) +
-                           vec3{0, 0, -1} * focal_dist;
+            vec3 P_focus_local = vec3(jit_screen_x * inter_p,
+                                      jit_screen_y * inter_p, -focal_dist);
 
-            vec3 local_dir = P_focus - random_unit_disk;
+            vec3 local_dir = P_focus_local - random_unit_disk;
 
             vec3 world_dir = local_dir.x() * cam_u + local_dir.y() * cam_v +
                              local_dir.z() * cam_w;
 
-            ray jittered_ray = ray(center, unit_vector(world_dir));
+            vec3 world_lens_offset =
+                random_unit_disk.x() * cam_u + random_unit_disk.y() * cam_v;
+            vec3 ray_origin = center + world_lens_offset;
 
-            double t_min = 0.0001; // avoid shadow acne
-            double t_max = std::numeric_limits<double>::max();
+            ray jittered_ray = ray(ray_origin, unit_vector(world_dir));
+
             double depth = 10; // limit to 10 bounces
 
-            avg_color += color(jittered_ray, world, t_min, t_max, depth);
+            avg_color += color(jittered_ray, world, depth);
         }
 
         return avg_color / num_samples;
     }
 
     // TODO: Impliment lighting and see how they can be rendered on a scene.
-    // NOTE: ray_tmin and ray_tmax should be somethig around 0.001, infinity
-    // So that we can no shadow acne, but again that is up the user
-    vec3 color(const ray &r, const hittable_list &world, double ray_tmin,
-               double ray_tmax, int depth) const {
+    vec3 color(const ray &r, const hittable_list &world, int depth) const {
         if (depth <= 0) {
             return vec3{0, 0, 0}; // shadows are dark
         }
 
         hit_record rec;
-        if (!world.hit(r, ray_tmin, ray_tmax, rec)) {
+        if (!world.hit(r, t_min, t_max, rec)) {
             vec3 u_dir = r.direction() / r.direction().length();
             // NOTE: If you want to change the background color then we change
             // it here: For now the setting is OUTSIDE, that is under natural
@@ -254,8 +233,7 @@ class camera {
         }
         ray new_ray = ray(rec.point, new_dir);
 
-        return elem_mul(rec.mat->color,
-                        color(new_ray, world, ray_tmin, ray_tmax, depth - 1));
+        return elem_mul(rec.mat->color, color(new_ray, world, depth - 1));
     }
 };
 
