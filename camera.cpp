@@ -94,6 +94,8 @@ class camera {
             break;
         }
         }
+        // TODO: Add a fisheye lens using a section of a large sphere as the
+        // image plane
     }
 
     // NOTE: This is supporting anti-aliasing and works for spherical lenses
