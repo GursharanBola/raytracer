@@ -22,9 +22,9 @@
 class camera {
   public:
     vec3 center;
-    vec3 cam_u;
-    vec3 cam_v;
-    vec3 cam_w;
+    vec3 cam_u; // right
+    vec3 cam_v; // up
+    vec3 cam_w; // backward
     enum CameraType { CAMERA_FLAT = 0, CAMERA_SPHERICAL = 1 };
     CameraType camera_type;
     double focal_length;
@@ -50,7 +50,8 @@ class camera {
         int aliasing_samples = 3;
 
         switch (camera_type) {
-        // TODO: Handle rotating the sphere for sampling.
+        // NOTE: This works with rotating the camera using cam_u, cam_v, and
+        // cam_w.
         case CAMERA_SPHERICAL: {
             double delta_theta = pi / (image_height - 1);
             double delta_phi = (2 * pi) / (image_width - 1);
@@ -61,11 +62,11 @@ class camera {
 
                 for (int j = 0; j < image_width; j++) {
 
-                    vec3 curr_hor_cir = curr_ver_cir.rotate_y(delta_phi * j);
+                    // vec3 curr_hor_cir = curr_ver_cir.rotate_y(delta_phi * j);
 
                     vec3 average_color = average_pixel_angular(
                         i, j, delta_theta, delta_phi, start_ver_cir, world,
-                        aliasing_samples, center);
+                        aliasing_samples, center, cam_u, cam_v, cam_w);
 
                     image.set_color(j, i,
                                     average_color); // TODO: maybe check if
@@ -121,10 +122,8 @@ class camera {
      * random vector that is within the correct radius of the appeture.
      */
 
-    // NOTE: This is supporting anti-aliasing for spherical lenses WIHTOUT
-    // rotation
-
-    // TODO: Support sub_pixel jittering WITH angleing the sphere.
+    // NOTE: This is supporting anti-aliasing and works for spherical lenses
+    // That CAN be rotated. Bokeh is not supported for spherical lenses.
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi, const vec3 &start_ver_cir,
                                const hittable_list &world, int num_samples,
@@ -148,7 +147,14 @@ class camera {
             vec3 jittered_dir =
                 start_ver_cir.rotate_x(jit_theta).rotate_y(jit_phi);
 
-            ray jittered_ray = ray(camera_center, jittered_dir);
+            vec3 rotated_and_jittered_dir = (jittered_dir.x() * cam_u) +
+                                            (jittered_dir.y() * cam_v) -
+                                            (jittered_dir.z() * cam_w);
+
+            rotated_and_jittered_dir =
+                rotated_and_jittered_dir / rotated_and_jittered_dir.length();
+
+            ray jittered_ray = ray(camera_center, rotated_and_jittered_dir);
             vec3 sample_color = color(jittered_ray, world);
 
             avg_color += sample_color;
@@ -156,7 +162,8 @@ class camera {
         return avg_color / num_samples;
     }
 
-    // NOTE:
+    // TODO: Support sub_pixel jittering as well as bokeh WITH angled focal
+    // plane.
     vec3 average_pixel_linear(int i, int j, double screen_z,
                               const hittable_list &world, int num_samples,
                               vec3 camera_center, int image_width,
