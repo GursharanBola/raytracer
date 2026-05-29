@@ -81,21 +81,12 @@ class camera {
             double aspect_ratio = (double)image_width / image_height;
             for (int i = 0; i < image_height; i++) {
                 for (int j = 0; j < image_width; j++) {
-
-                    double percent_x = (j + 0.5) / image_width;
-                    double percent_y = (i + 0.5) / image_height;
-
-                    double screen_x =
-                        center.vec[0] + (2.0 * percent_x - 1.0) * aspect_ratio;
-                    double screen_y = center.vec[1] - (2.0 * percent_y - 1.0);
-                    double screen_z = center.vec[2] - focal_length;
-
-                    vec3 screen_point = vec3{screen_x, screen_y, screen_z};
-                    vec3 dir = unit_vector(screen_point - center);
+                    double apeture_radius = 0.5;
 
                     vec3 avg_color = average_pixel_linear(
-                        i, j, screen_z, world, aliasing_samples, center,
-                        image_width, image_height);
+                        i, j, -focal_length, world, aliasing_samples, center,
+                        image_width, image_height, apeture_radius, cam_u, cam_v,
+                        cam_w);
 
                     image.set_color(j, i, avg_color);
                 }
@@ -151,7 +142,13 @@ class camera {
                 rotated_and_jittered_dir / rotated_and_jittered_dir.length();
 
             ray jittered_ray = ray(camera_center, rotated_and_jittered_dir);
-            vec3 sample_color = color(jittered_ray, world);
+
+            double t_min = 0.0001;
+            double t_max = std::numeric_limits<double>::max();
+
+            int depth = 10;
+
+            vec3 sample_color = color(jittered_ray, world, t_min, t_max, depth);
 
             avg_color += sample_color;
         }
@@ -162,8 +159,10 @@ class camera {
     // plane.
     vec3 average_pixel_linear(int i, int j, double screen_z,
                               const hittable_list &world, int num_samples,
-                              vec3 camera_center, int image_width,
-                              int image_height, double aperture_radius) const {
+                              const vec3 &camera_center, int image_width,
+                              int image_height, double aperture_radius,
+                              const vec3 &cam_u, const vec3 &cam_v,
+                              const vec3 &cam_w) const {
         vec3 avg_color = vec3{0, 0, 0};
 
         double aspect_ratio = (double)image_width / image_height;
@@ -177,15 +176,28 @@ class camera {
             double jit_i = i + dis(gen);
             double jit_j = j + dis(gen);
 
-            double jit_screen_x =
-                ((jit_j / (image_width - 1)) * 2.0 - 1.0) * aspect_ratio;
-            double jit_screen_y = (jit_i / (image_height - 1)) * 2.0 - 1.0;
+            double percent_x = jit_j / image_width;
+            double percent_y = jit_i / image_height;
 
-            vec3 jittered_dir = vec3{jit_screen_x, jit_screen_y, screen_z};
+            double jit_screen_x = (2.0 * percent_x - 1.0) * aspect_ratio;
+            double jit_screen_y = -(2.0 * percent_y - 1.0);
 
-            ray jittered_ray = ray(camera_center, unit_vector(jittered_dir));
+            vec3 rotated_and_jittered_dir = (jit_screen_x * cam_u) +
+                                            (jit_screen_y * cam_v) +
+                                            (screen_z * cam_w);
 
-            avg_color += color(jittered_ray, world);
+            vec3 rotated_shifted_and_jittered_dir =
+                rotated_and_jittered_dir + center;
+
+            ray jittered_ray =
+                ray(camera_center, unit_vector(rotated_and_jittered_dir));
+
+            double t_min = 0.0001; // This is going to be used so that we can
+                                   // avoid shadow acne
+            double t_max = std::numeric_limits<double>::max();
+            double depth = 10; // limit to 10 bounces
+
+            avg_color += color(jittered_ray, world, t_min, t_max, depth);
         }
 
         return avg_color / num_samples;
