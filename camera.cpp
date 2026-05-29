@@ -103,23 +103,19 @@ class camera {
             break;
         }
         }
+        // TODO: OPTIONAL: Create a Fisheye a large cut out of a sphere
     }
 
-    /*
-    ** If I want bokeh I should have a lens in between the focal plane. Now we
-    * have an ideal pin hole camera
-    ** that reads the focal plane.
-    ** For each point on lens, we sample the entire scene so for each part of
-    * the lens we get an image of the scene
-    * from that perspective. We do this for all points on the lens and then
-    * return the average of the colors. If we want this to work
-    * quickly we just take a representive sample instead of perfect recreation,
-    * this is just monte-carlo approximation.
-    */
-
-    /* Right now, I will stick with aperture's that are completely circular
-     * That means we have to do some rejection sampling so that we can get
-     * random vector that is within the correct radius of the appeture.
+    /*------------------------------- DESIGN -----------------------------*/
+    /*  Bokeh, camera rotation, and antialiasing is supported for flat sensors.
+     * In order to do this in, average_pixel_linear() I will jitter start of the
+     * shooting ray to be within a disk (standard x^2 +y^2 = 1) and then rotate
+     * it: pitch, yaw, and roll by doing the opperation one Line 140 and adding
+     * it to the start of the ray.
+     *
+     * Antialiasing will be done by doing sub_pixel jittering (i +- .5 and j +-
+     * .5) and sampling multiple times. Notice that we are doing both
+     * opperations at the same time i.e.: O(s) time.
      */
 
     // NOTE: This is supporting anti-aliasing and works for spherical lenses
