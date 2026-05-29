@@ -29,11 +29,12 @@ class camera {
     CameraType camera_type;
     double focal_length;
     double pi = 3.1415926535897932;
-    camera(const vec3 &camera_center, CameraType type, double f_length = 1.0,
-           vec3 u_axis = vec3(1, 0, 0), vec3 v_axis = vec3(0, 1, 0),
-           vec3 w_axis = vec3(0, 0, 1))
+    double focal_dist;
+    camera(const vec3 &camera_center, CameraType type, double f_dist,
+           double f_length = 1.0, vec3 u_axis = vec3(1, 0, 0),
+           vec3 v_axis = vec3(0, 1, 0), vec3 w_axis = vec3(0, 0, 1))
         : center(camera_center), camera_type(type), focal_length(f_length),
-          cam_u(u_axis), cam_v(v_axis), cam_w(w_axis) {}
+          cam_u(u_axis), cam_v(v_axis), cam_w(w_axis), focal_dist(f_dist) {}
 
     // NOTE: This is for varied image sizes which isn't supported yet so we
     // should stick to inputting image_width and img_height as it is hard coded
@@ -84,9 +85,9 @@ class camera {
                     double apeture_radius = 0.5;
 
                     vec3 avg_color = average_pixel_linear(
-                        i, j, -focal_length, world, aliasing_samples, center,
-                        image_width, image_height, apeture_radius, cam_u, cam_v,
-                        cam_w);
+                        i, j, world, aliasing_samples, image_width,
+                        image_height, apeture_radius, cam_u, cam_v, cam_w,
+                        focal_dist);
 
                     image.set_color(j, i, avg_color);
                 }
@@ -157,12 +158,11 @@ class camera {
 
     // TODO: Support sub_pixel jittering as well as bokeh WITH angled focal
     // plane.
-    vec3 average_pixel_linear(int i, int j, double screen_z,
-                              const hittable_list &world, int num_samples,
-                              const vec3 &camera_center, int image_width,
+    vec3 average_pixel_linear(int i, int j, const hittable_list &world,
+                              int num_samples, int image_width,
                               int image_height, double aperture_radius,
                               const vec3 &cam_u, const vec3 &cam_v,
-                              const vec3 &cam_w) const {
+                              const vec3 &cam_w, double focal_dist) const {
         vec3 avg_color = vec3{0, 0, 0};
 
         double aspect_ratio = (double)image_width / image_height;
@@ -184,16 +184,34 @@ class camera {
 
             vec3 rotated_and_jittered_dir = (jit_screen_x * cam_u) +
                                             (jit_screen_y * cam_v) +
-                                            (screen_z * cam_w);
+                                            (-focal_length * cam_w);
 
-            vec3 rotated_shifted_and_jittered_dir =
-                rotated_and_jittered_dir + center;
+            // NOTE: Bokeh vvv
+            vec3 random_unit_disk =
+                random_vec3(-aperture_radius, aperture_radius);
+            random_unit_disk.vec[2] = 0;
 
-            ray jittered_ray =
-                ray(camera_center, unit_vector(rotated_and_jittered_dir));
+            while (dot(random_unit_disk, random_unit_disk) >
+                   aperture_radius * aperture_radius) {
+                random_unit_disk =
+                    random_vec3(-aperture_radius, aperture_radius);
+                random_unit_disk.vec[2] = 0;
+            }
 
-            double t_min = 0.0001; // This is going to be used so that we can
-                                   // avoid shadow acne
+            double inter_p = focal_dist / focal_length;
+
+            vec3 P_focus = (jit_screen_x * inter_p * cam_u) +
+                           (jit_screen_y * inter_p * cam_v) +
+                           vec3{0, 0, -1} * focal_dist;
+
+            vec3 local_dir = P_focus - random_unit_disk;
+
+            vec3 world_dir = local_dir.x() * cam_u + local_dir.y() * cam_v +
+                             local_dir.z() * cam_w;
+
+            ray jittered_ray = ray(center, unit_vector(world_dir));
+
+            double t_min = 0.0001; // avoid shadow acne
             double t_max = std::numeric_limits<double>::max();
             double depth = 10; // limit to 10 bounces
 
