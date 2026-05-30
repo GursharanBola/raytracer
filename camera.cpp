@@ -226,7 +226,8 @@ class camera {
         }
 
         // NOTE: bounce() must always return the direction.
-        vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction());
+        vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction(),
+                                       rec.front_face);
         double s = 1e-8; // check for dead rays.
         if ((std::fabs(new_dir.vec[0]) < s) &&
             (std::fabs(new_dir.vec[1]) < s) &&

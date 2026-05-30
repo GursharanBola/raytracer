@@ -14,7 +14,7 @@ class material {
     // matte surfaces need to know the hit_location, whereas metals and glass
     // need to now the ray_direction
     virtual vec3 bounce(const vec3 &hit_location, const vec3 &normal,
-                        vec3 ray_direction) const = 0;
+                        vec3 ray_direction, bool is_entering) const = 0;
 };
 
 #endif

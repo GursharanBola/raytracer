@@ -12,7 +12,7 @@ class metal_surface : public material {
         fuzziness = (fuzz < 0.0) ? 0.0 : ((fuzz > 1.0) ? 1.0 : fuzz);
     }
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
-                const vec3 ray_direction) const override {
+                const vec3 ray_direction, bool is_entering) const override {
         vec3 res;
         res = ray_direction - 2 * (dot(ray_direction, normal)) * normal;
 
