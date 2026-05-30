@@ -96,8 +96,14 @@ class camera {
         // NOTE: Fisheye lenses support ONLY camera rotations.
         case CAMERA_FISHEYE: {
 
-            double angular_width;  // phi direction (+- this is the range)
-            double angular_height; // theta direction   (+- this is the range)
+            // NOTE: Currently the angular width and height are hard coded
+            // but can easily be updated to support any angular width but I
+            // don't want to further clutter the already cluttered deceleration
+            // for camera
+            double angular_width =
+                pi / 6; // phi direction (+- this is the range)
+            double angular_height =
+                pi / 6; // theta direction   (+- this is the range)
 
             double delta_theta = 2 * angular_height / (image_height - 1);
             double delta_phi = 2 * angular_width / (image_width - 1);
