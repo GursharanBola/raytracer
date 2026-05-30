@@ -19,7 +19,16 @@ class glass_surface : public material {
         double sin_squared = 1 - cos_theta * cos_theta;
         double feas_check = eta_ratio * eta_ratio * sin_squared;
 
-        if (feas_check > 1) {
+        double r0 = (1.0 - refrac_index) / (1.0 + refrac_index);
+        r0 = r0 * r0;
+
+        double one_minus = 1 - cos_theta;
+        double one_minus_2 = one_minus * one_minus;
+        double one_minus_4 = one_minus_2 * one_minus_2;
+
+        double prob = r0 + (1.0 - r0) * one_minus_4 * one_minus;
+
+        if (feas_check > 1 || prob > random_double()) {
             return ray_direction + 2.0 * cos_theta * normal;
         } else {
             vec3 R_perp = eta_ratio * (ray_direction + cos_theta * normal);
