@@ -38,8 +38,8 @@ class hittable_list : public hittable {
     bool hit(const ray &r, double ray_tmin, double ray_tmax,
              hit_record &rec) const override {
 
-        // TODO: We will come back to this list so that we determine quickly
-        // whether or not we need to actually some objects.
+        // TODO: Bound object to quickly determine if we have to actually render
+        // some of the objects.
         double closest_dist = ray_tmax;
         bool did_hit = false;
 

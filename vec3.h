@@ -62,20 +62,6 @@ class vec3 {
                this->vec[2] * this->vec[2];
     }
     double length() const { return std::sqrt(this->length_squared()); }
-
-    // rotation based on x coming out of the page, y being vertical and z
-    // following the right hand rule.
-    vec3 rotate_y(double angle) const {
-        double c = std::cos(angle);
-        double s = std::sin(angle);
-        return vec3{vec[0] * c + vec[2] * s, vec[1], -vec[0] * s + vec[2] * c};
-    }
-
-    vec3 rotate_x(double angle) const {
-        double c = std::cos(angle);
-        double s = std::sin(angle);
-        return vec3{vec[0], vec[1] * c - vec[2] * s, vec[1] * s + vec[2] * c};
-    }
 };
 
 inline vec3 operator-(const vec3 &u, const vec3 &v) {
@@ -132,6 +118,22 @@ inline vec3 random_vec3(double min, double max) {
 inline vec3 elem_mul(vec3 v1, vec3 v2) {
     return vec3(v1.vec[0] * v2.vec[0], v1.vec[1] * v2.vec[1],
                 v1.vec[2] * v2.vec[2]);
+}
+
+inline vec3 rotate_vertical(const vec3 &v, double theta) {
+    double cos_theta = std::cos(theta);
+    double sin_theta = std::sin(theta);
+
+    return vec3(v.x(), v.y() * cos_theta - v.z() * sin_theta,
+                v.y() * sin_theta + v.z() * cos_theta);
+}
+
+inline vec3 rotate_horizontal(const vec3 &v, double phi) {
+    double cos_phi = std::cos(phi);
+    double sin_phi = std::sin(phi);
+
+    return vec3(v.x() * cos_phi + v.z() * sin_phi, v.y(),
+                -v.x() * sin_phi + v.z() * cos_phi);
 }
 
 #endif

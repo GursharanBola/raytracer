@@ -25,7 +25,11 @@ class camera {
     vec3 cam_u; // right
     vec3 cam_v; // up
     vec3 cam_w; // backward
-    enum CameraType { CAMERA_FLAT = 0, CAMERA_SPHERICAL = 1 };
+    enum CameraType {
+        CAMERA_FLAT = 0,
+        CAMERA_SPHERICAL = 1,
+        CAMERA_FISHEYE = 2
+    };
     CameraType camera_type;
     double focal_length;
     double pi = 3.1415926535897932;
@@ -40,7 +44,7 @@ class camera {
            vec3 w_axis = vec3(0, 0, 1))
         : center(camera_center), cam_u(u_axis), cam_v(v_axis), cam_w(w_axis),
           camera_type(type), focal_length(f_length), focal_dist(f_dist),
-          t_max(tray_max), t_min(tray_min) {}
+          t_max{tray_max}, t_min{tray_min} {}
 
     // NOTE: This is for varied image sizes which isn't supported yet so we
     // should stick to inputting image_width and img_height as it is hard coded
@@ -53,23 +57,19 @@ class camera {
         int aliasing_samples = 3;
 
         switch (camera_type) {
-        // NOTE: This works with rotating the camera using cam_u, cam_v, and
-        // cam_w.
         case CAMERA_SPHERICAL: {
+            // NOTE: Theta is the vertical and phi is the horizontal.
             double delta_theta = pi / (image_height - 1);
             double delta_phi = (2 * pi) / (image_width - 1);
-            vec3 start_ver_cir = vec3{0, focal_length, 0};
+            // vec3 start_ver_cir = vec3{0, focal_length, 0};
 
             for (int i = 0; i < image_height; i++) {
-                vec3 curr_ver_cir = start_ver_cir.rotate_x(delta_theta * i);
-
+                // vec3 curr_ver_cir = start_ver_cir.rotate_x(delta_theta * i);
                 for (int j = 0; j < image_width; j++) {
-
                     // vec3 curr_hor_cir = curr_ver_cir.rotate_y(delta_phi * j);
-
                     vec3 average_color = average_pixel_angular(
-                        i, j, delta_theta, delta_phi, start_ver_cir, world,
-                        aliasing_samples, center, cam_u, cam_v, cam_w);
+                        i, j, delta_theta, delta_phi, world, aliasing_samples,
+                        cam_u, cam_v, cam_w);
 
                     image.set_color(
                         j, i,
@@ -93,17 +93,51 @@ class camera {
             }
             break;
         }
+        // NOTE: Fisheye lenses support ONLY camera rotations.
+        case CAMERA_FISHEYE: {
+
+            double angular_width;  // phi direction (+- this is the range)
+            double angular_height; // theta direction   (+- this is the range)
+
+            double delta_theta = 2 * angular_height / (image_height - 1);
+            double delta_phi = 2 * angular_width / (image_width - 1);
+
+            double cen_t = pi / 2;
+            double cen_p = pi;
+
+            for (int i = 0; i < image_height; i++) {
+                double theta = cen_t - angular_height + delta_theta * i;
+                double sin_theta = std::sin(theta);
+                double cos_theta = std::cos(theta);
+                for (int j = 0; j < image_width; j++) {
+                    double phi = cen_p - angular_width + delta_phi * j;
+                    double sin_phi = std::sin(phi);
+                    double cos_phi = std::cos(phi);
+
+                    vec3 local_dir = vec3(-sin_theta * sin_phi, cos_theta,
+                                          -sin_theta * cos_phi);
+
+                    vec3 global_dir = (local_dir.x() * cam_u) +
+                                      (local_dir.y() * cam_v) -
+                                      (local_dir.z() * cam_w);
+
+                    ray r = ray(center, unit_vector(global_dir));
+
+                    int depth = 10; // limit to 10 bounces
+                    vec3 single_color = color(r, world, depth);
+                    image.set_color(j, i, single_color);
+                }
+            }
+            break;
         }
-        // TODO: Add a fisheye lens using a section of a large sphere as the
-        // image plane
+        }
     }
 
     // NOTE: This is supporting anti-aliasing and works for spherical lenses
     // That CAN be rotated. Bokeh is not supported for spherical lenses.
     vec3 average_pixel_angular(int i, int j, double delta_theta,
-                               double delta_phi, const vec3 &start_ver_cir,
-                               const hittable_list &world, int num_samples,
-                               vec3 camera_center, vec3 cam_u, vec3 cam_v,
+                               double delta_phi, const hittable_list &world,
+                               int num_samples, vec3 cam_u, vec3 cam_v,
                                vec3 cam_w) const {
 
         vec3 avg_color = vec3{0, 0, 0};
@@ -119,20 +153,28 @@ class camera {
             double jit_theta = delta_theta * (i + random_t);
             double jit_phi = delta_phi * (j + random_p);
 
+            // Rotation of vector.
+            // jittered_dir =
+            // start_ver_cir.rotate_ver(jit_theta).rotate_hor(jit_phi);
+            double sin_theta = std::sin(jit_theta);
+            double cos_theta = std::cos(jit_theta);
+            double sin_phi = std::sin(jit_phi);
+            double cos_phi = std::cos(jit_phi);
+
             vec3 jittered_dir =
-                start_ver_cir.rotate_x(jit_theta).rotate_y(jit_phi);
+                vec3(-sin_theta * (std::sin(jit_phi)), // X component
+                     cos_theta,                        // Y component
+                     -sin_theta * (std::cos(jit_phi))  // Z component
+                );
 
-            vec3 rotated_and_jittered_dir = (jittered_dir.x() * cam_u) +
-                                            (jittered_dir.y() * cam_v) -
-                                            (jittered_dir.z() * cam_w);
+            vec3 global_jittered_dir = (jittered_dir.x() * cam_u) +
+                                       (jittered_dir.y() * cam_v) -
+                                       (jittered_dir.z() * cam_w);
 
-            rotated_and_jittered_dir =
-                rotated_and_jittered_dir / rotated_and_jittered_dir.length();
+            global_jittered_dir =
+                global_jittered_dir / global_jittered_dir.length();
 
-            ray jittered_ray = ray(camera_center, rotated_and_jittered_dir);
-
-            double t_min = 0.0001;
-            double t_max = std::numeric_limits<double>::max();
+            ray jittered_ray = ray(center, global_jittered_dir);
 
             int depth = 10; // limit to 10 bounces.
 
