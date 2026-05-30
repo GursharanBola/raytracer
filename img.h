@@ -42,9 +42,9 @@ class img {
                     image_buffer[index + 1] / 255.0,
                     image_buffer[index + 2] / 255.0);
     }
-    int set_color(const int x, const int y, vec3 color) {
+    bool set_color(const int x, const int y, vec3 color) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return 0; // We failed
+            return false; // We failed
         }
 
         int index = 3 * x + 3 * width * y;
@@ -53,7 +53,7 @@ class img {
         image_buffer[index + 1] = static_cast<int>(255.999 * color.vec[1]);
         image_buffer[index + 2] = static_cast<int>(255.999 * color.vec[2]);
 
-        return 1;
+        return true;
     }
 };
 

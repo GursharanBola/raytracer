@@ -9,8 +9,8 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <stdexcept>
 #include <vector>
-
 /**
  * For this project the camera type will determine the rendering that we will
  * see the render() function will render the objects by calling color() as a
@@ -71,9 +71,11 @@ class camera {
                         i, j, delta_theta, delta_phi, world, aliasing_samples,
                         cam_u, cam_v, cam_w);
 
-                    image.set_color(
-                        j, i,
-                        average_color); // TODO: check if set_color() fails.
+                    bool valid = image.set_color(j, i, average_color);
+                    if (!valid) {
+                        throw std::runtime_error(
+                            "Somehow failed to set color!");
+                    }
                 }
             }
             break;
