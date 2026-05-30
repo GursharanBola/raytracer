@@ -15,6 +15,7 @@ class material {
     // need to now the ray_direction
     virtual vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                         vec3 ray_direction, bool is_entering) const = 0;
+    virtual bool is_light();
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include "vec3.h"
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -255,7 +256,6 @@ class camera {
         return avg_color / num_samples;
     }
 
-    // TODO: Impliment lighting and see how they can be rendered on a scene.
     vec3 color(const ray &r, const hittable_list &world, int depth) const {
         if (depth <= 0) {
             return vec3{0, 0, 0}; // shadows are dark
@@ -274,6 +274,10 @@ class camera {
 
             return (1 - normalized_y) * white + light_blue * normalized_y;
         }
+        // Terminate early if we hit a light.
+        if (rec.mat->is_light()) {
+            return rec.mat->color;
+        }
 
         // NOTE: bounce() must always return the direction.
         vec3 new_dir = rec.mat->bounce(rec.point, rec.normal, r.direction(),
@@ -286,7 +290,14 @@ class camera {
         }
         ray new_ray = ray(rec.point, new_dir);
 
-        return elem_mul(rec.mat->color, color(new_ray, world, depth - 1));
+        vec3 single_color = color(new_ray, world, depth - 1);
+
+        // Gamma correction.
+        vec3 corrected_color =
+            vec3(std::sqrt(single_color.x()), std::sqrt(single_color.y()),
+                 std::sqrt(single_color.z()));
+
+        return elem_mul(rec.mat->color, corrected_color);
     }
 };
 

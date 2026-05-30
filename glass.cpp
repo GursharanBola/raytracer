@@ -36,5 +36,6 @@ class glass_surface : public material {
             return R_perp + R_parallel;
         }
     }
+    bool is_light() override { return false; }
 };
 #endif

@@ -29,5 +29,6 @@ class metal_surface : public material {
             return vec3{0, 0, 0};
         }
     }
+    bool is_light() override { return false; }
 };
 #endif
