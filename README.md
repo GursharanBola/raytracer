@@ -7,5 +7,4 @@ Right now, the project supports antialiasing, spherical cameras that can be plac
 
 I am currently working on fisheye lenses.
 
-In the future I will support fill lighting. I hope to add some parallelism to this as well either with openMP (since it is more simple), but
-if I have more time this summer, then maybe using C++'s STD libraries for manging threads and mutex's. 
+In the future I will also support support fill lighting and single core optimization to the rendering loop. I hope to add some parallelism to this as well either with openMP (since it is more simple), but if I have more time this summer, then maybe using C++'s STD libraries for manging threads and mutex's. 
