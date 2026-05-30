@@ -20,12 +20,10 @@ class glass_surface : public material {
         double feas_check = eta_ratio * eta_ratio * sin_squared;
 
         if (feas_check > 1) {
-            return ray_direction - 2 * (dot(ray_direction, normal)) * normal;
+            return ray_direction + 2.0 * cos_theta * normal;
         } else {
-            vec3 R_perp = eta_ratio * (ray_direction +
-                                       (-dot(ray_direction, normal) * normal));
-            vec3 R_parallel =
-                -1 * std::sqrt(1 - R_perp.length() * R_perp.length()) * normal;
+            vec3 R_perp = eta_ratio * (ray_direction + cos_theta * normal);
+            vec3 R_parallel = -std::sqrt(std::abs(1.0 - feas_check)) * normal;
             return R_perp + R_parallel;
         }
     }
