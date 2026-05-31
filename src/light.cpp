@@ -9,5 +9,5 @@ class light : public material {
                 const vec3 ray_direction, bool is_entering) const override {
         return vec3{0, 0, 0}; // don't bounce
     }
-    bool is_light() override { return true; }
+    bool is_light() const override { return true; }
 };

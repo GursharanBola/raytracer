@@ -1,4 +1,5 @@
 #include "img.h"
+#include "vec3.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -36,9 +37,17 @@ bool img::set_color(const int x, const int y, vec3 color) {
 
     int index = 3 * x + 3 * width * y;
 
-    image_buffer[index] = static_cast<int>(255.999 * color.vec[0]);
-    image_buffer[index + 1] = static_cast<int>(255.999 * color.vec[1]);
-    image_buffer[index + 2] = static_cast<int>(255.999 * color.vec[2]);
+    double r = color.vec[0];
+    double g = color.vec[1];
+    double b = color.vec[2];
+
+    r = clamp(r, 0.0, 1.0);
+    g = clamp(g, 0.0, 1.0);
+    b = clamp(b, 0.0, 1.0);
+
+    image_buffer[index] = static_cast<int>(255.999 * r);
+    image_buffer[index + 1] = static_cast<int>(255.999 * g);
+    image_buffer[index + 2] = static_cast<int>(255.999 * b);
 
     return true;
 }

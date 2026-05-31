@@ -33,5 +33,5 @@ class glass : public material {
             return R_perp + R_parallel;
         }
     }
-    bool is_light() override { return false; }
+    bool is_light() const override { return false; }
 };

@@ -25,5 +25,5 @@ class lambertian : public material {
 
         return bounce_direction / bounce_direction.length();
     }
-    bool is_light() override { return false; }
+    bool is_light() const override { return false; }
 };

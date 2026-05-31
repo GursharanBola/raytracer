@@ -1,9 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-
-#include "hittable.h"
 #include "hittable_list.h"
-#include "img.h"
 #include "material.h"
 #include "vec3.h"
 #include <limits>
@@ -41,7 +38,7 @@ class camera {
     double t_max;
     double t_min;
     int num_samples = 3; // number of antialiasing samples.
-
+    int depth = 10;
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi,
                                const hittable_list &world) const;

@@ -86,10 +86,12 @@ void camera::render(const hittable_list &world, int image_width,
 
                 ray r = ray(center, unit_vector(global_dir));
 
-                int depth = 10; // limit to 10 bounces
                 vec3 single_color = color(r, world, depth);
                 single_color = gamma_correct(single_color);
-                image.set_color(j, i, single_color);
+                bool valid = image.set_color(j, i, single_color);
+                if (!valid) {
+                    throw std::runtime_error("Somehow failed to set color!");
+                }
             }
         }
         break;
@@ -106,8 +108,8 @@ vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
 
     vec3 avg_color = vec3{0, 0, 0};
 
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    thread_local static std::random_device rd;
+    thread_local static std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis(-0.5, 0.5);
 
     for (int k = 0; k < num_samples; k++) {
@@ -115,7 +117,7 @@ vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
         double random_t = dis(gen);
         double random_p = dis(gen);
         double jit_theta = delta_theta * (i + random_t);
-        double jit_phi = delta_phi * (j + random_p);
+        double jit_phi = delta_phi * (j + random_p) - pi;
 
         // Rotation of vector.
         // jittered_dir =
@@ -125,11 +127,10 @@ vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
         double sin_phi = std::sin(jit_phi);
         double cos_phi = std::cos(jit_phi);
 
-        vec3 jittered_dir =
-            vec3(-sin_theta * (std::sin(jit_phi)), // X component
-                 cos_theta,                        // Y component
-                 -sin_theta * (std::cos(jit_phi))  // Z component
-            );
+        vec3 jittered_dir = vec3(sin_theta * (std::sin(jit_phi)), // X component
+                                 cos_theta,                       // Y component
+                                 sin_theta * (std::cos(jit_phi))  // Z component
+        );
 
         vec3 global_jittered_dir = (jittered_dir.x() * cam_u) +
                                    (jittered_dir.y() * cam_v) -
@@ -139,8 +140,6 @@ vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
             global_jittered_dir / global_jittered_dir.length();
 
         ray jittered_ray = ray(center, global_jittered_dir);
-
-        int depth = 10; // limit to 10 bounces.
 
         vec3 sample_color = color(jittered_ray, world, depth);
 
@@ -154,15 +153,14 @@ vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
 
 // NOTE: Flat lenses do have Bokeh, Anti Aliasing, can be rotated, and
 // shifted.
-
 vec3 camera::average_pixel_linear(int i, int j, const hittable_list &world,
                                   int image_width, int image_height) const {
     vec3 avg_color = vec3{0, 0, 0};
 
     double aspect_ratio = (double)image_width / image_height;
 
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    thread_local static std::random_device rd;
+    thread_local static std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis(-0.5, 0.5);
 
     for (int k = 0; k < num_samples; k++) {
@@ -201,8 +199,6 @@ vec3 camera::average_pixel_linear(int i, int j, const hittable_list &world,
         vec3 ray_origin = center + world_lens_offset;
 
         ray jittered_ray = ray(ray_origin, unit_vector(world_dir));
-
-        double depth = 10; // limit to 10 bounces
 
         vec3 sample_color = color(jittered_ray, world, depth);
 

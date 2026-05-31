@@ -26,5 +26,5 @@ class metal : public material {
             return vec3{0, 0, 0};
         }
     }
-    bool is_light() override { return false; }
+    bool is_light() const override { return false; }
 };

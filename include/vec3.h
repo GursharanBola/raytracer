@@ -1,9 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 #include <cmath>
-#include <iostream>
 #include <random>
-#include <vector>
 
 class vec3 {
   public:

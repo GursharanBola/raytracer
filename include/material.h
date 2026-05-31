@@ -1,7 +1,6 @@
 #ifndef MATERIAL
 #define MATERIAL
 
-#include "ray.h"
 #include "vec3.h"
 
 class hittable_list;
@@ -15,7 +14,7 @@ class material {
     // need to now the ray_direction. Glass also needs to know is_entering.
     virtual vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                         vec3 ray_direction, bool is_entering) const = 0;
-    virtual bool is_light();
+    virtual bool is_light() const;
 };
 
 #endif

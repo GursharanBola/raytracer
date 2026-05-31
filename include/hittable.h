@@ -3,9 +3,7 @@
 
 #include "ray.h"
 #include "vec3.h"
-#include <iostream>
 #include <memory>
-#include <vector>
 
 /*
 ** We will be using the vec3 class for both points AND vectors AND colors

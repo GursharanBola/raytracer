@@ -24,4 +24,12 @@ class img {
     bool set_color(const int x, const int y, vec3 color);
 };
 
+inline double clamp(double x, double min, double max) {
+    if (x < min)
+        return min;
+    if (x > max)
+        return max;
+    return x;
+}
+
 #endif
