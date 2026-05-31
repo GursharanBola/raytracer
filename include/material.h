@@ -12,7 +12,7 @@ class material {
     virtual ~material() = default;
     vec3 color{0, 0, 0};
     // matte surfaces need to know the hit_location, whereas metals and glass
-    // need to now the ray_direction
+    // need to now the ray_direction. Glass also needs to know is_entering.
     virtual vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                         vec3 ray_direction, bool is_entering) const = 0;
     virtual bool is_light();

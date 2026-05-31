@@ -1,7 +1,5 @@
 #ifndef VEC3_H
 #define VEC3_H
-
-// Some standard libraries
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -51,12 +49,6 @@ class vec3 {
         return vec3(i, j, k);
     }
 
-    // previously implimented version no inline functionality
-    // double dot(const vec3 &v1) {
-    //     vec3 v = elem_mul(*this, v1);
-    //     return elem_sum(v);
-    // }
-
     double length_squared() const {
         return this->vec[0] * this->vec[0] + this->vec[1] * this->vec[1] +
                this->vec[2] * this->vec[2];
@@ -100,14 +92,14 @@ inline double distance(const vec3 v1, const vec3 v2) {
 inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
 
 inline double random_double() {
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     static std::mt19937 generator;
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
     return distribution(generator);
 }
 
 inline double random_double(double min, double max) {
-    static std::uniform_real_distribution<double> distribution(min, max);
     static std::mt19937 generator;
+    std::uniform_real_distribution<double> distribution(min, max);
     return distribution(generator);
 }
 

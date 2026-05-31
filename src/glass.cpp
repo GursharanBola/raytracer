@@ -1,13 +1,10 @@
-#ifndef GLASS_H
-#define GLASS_H
-
 #include "material.h"
 #include "vec3.h"
 
-class glass_surface : public material {
+class glass : public material {
   public:
     double refrac_index;
-    glass_surface(vec3 material_color, double refractive_index) {
+    glass(vec3 material_color, double refractive_index) {
         color = material_color;
         refrac_index = refractive_index;
     }
@@ -38,4 +35,3 @@ class glass_surface : public material {
     }
     bool is_light() override { return false; }
 };
-#endif

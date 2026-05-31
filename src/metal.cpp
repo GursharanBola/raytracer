@@ -1,13 +1,10 @@
-#ifndef METAL_H
-#define METAL_H
-
 #include "material.h"
 #include "vec3.h"
 
-class metal_surface : public material {
+class metal : public material {
   public:
     double fuzziness;
-    metal_surface(vec3 material_color, double fuzz) {
+    metal(vec3 material_color, double fuzz) {
         color = material_color;
         fuzziness = (fuzz < 0.0) ? 0.0 : ((fuzz > 1.0) ? 1.0 : fuzz);
     }
@@ -31,4 +28,3 @@ class metal_surface : public material {
     }
     bool is_light() override { return false; }
 };
-#endif

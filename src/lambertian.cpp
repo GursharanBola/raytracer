@@ -1,13 +1,10 @@
-#ifndef LAMBERTIAN_SURFACE_H
-#define LAMBERTIAN_SURFACE_H
-
 #include "material.h"
 #include "vec3.h"
 
-class lambertian_surface : public material {
+class lambertian : public material {
   public:
     // It must be that we send in the color before we make the item.
-    lambertian_surface(vec3 material_color) { color = material_color; }
+    lambertian(vec3 material_color) { color = material_color; }
     vec3 bounce(const vec3 &hit_location, const vec3 &normal,
                 const vec3 ray_direction, bool is_entering) const override {
         int radius = 1;
@@ -30,4 +27,3 @@ class lambertian_surface : public material {
     }
     bool is_light() override { return false; }
 };
-#endif
