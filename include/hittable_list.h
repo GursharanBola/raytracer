@@ -11,9 +11,6 @@ using std::make_shared;
 using std::shared_ptr;
 
 class hittable_list : public hittable {
-
-    // We need to find a way to add and remove objects from the list
-
   public:
     std::vector<shared_ptr<hittable>> objects;
 
@@ -38,17 +35,16 @@ class hittable_list : public hittable {
 
         // TODO: Bound object to quickly determine if we have to actually render
         // some of the objects.
+        hit_record temp_rec;
         double closest_dist = ray_tmax;
         bool did_hit = false;
-
-        // NOTE: This is only safe if rec is written to only on true statements!
-        // For any future shapes we impliment we need it so that we only write
-        // to rec IFF we have a valid intersection.
 
         for (const auto &object : this->objects) {
             if (object->hit(r, ray_tmin, closest_dist, rec)) {
                 did_hit = true;
                 closest_dist = rec.t;
+
+                rec = temp_rec;
             }
         }
         return did_hit;

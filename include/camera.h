@@ -37,7 +37,7 @@ class camera {
     double aperture_radius = 0.5;
     double t_max;
     double t_min;
-    int num_samples = 3; // number of antialiasing samples.
+    int num_samples = 20; // number of antialiasing samples.
     int depth = 10;
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi,
