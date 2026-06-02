@@ -1,3 +1,0 @@
-/home/sharan/raytracer/build/CMakeFiles/raytracer.dir
-/home/sharan/raytracer/build/CMakeFiles/edit_cache.dir
-/home/sharan/raytracer/build/CMakeFiles/rebuild_cache.dir

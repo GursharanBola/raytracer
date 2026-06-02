@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/sharan/raytracer/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

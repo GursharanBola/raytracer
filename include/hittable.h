@@ -35,4 +35,20 @@ class hittable {
     virtual bool hit(const ray &r, double ray_tmin, double ray_tmax,
                      hit_record &rec) const = 0;
 };
+
+class sphere : public hittable {
+  public:
+    sphere(const vec3 &center, double radius, std::shared_ptr<material> mat)
+        : center(center), radius(std::fmax(0, radius)), mat(mat) {};
+
+    bool hit(const ray &r, double t_min, double t_max,
+             hit_record &rec) const override;
+    inline vec3 get_center() const { return center; }
+    inline double get_radius() const { return radius; }
+
+  private:
+    vec3 center;
+    double radius;
+    std::shared_ptr<material> mat;
+};
 #endif
