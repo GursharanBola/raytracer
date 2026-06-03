@@ -8,13 +8,13 @@
 
 class img {
   public:
-    static constexpr int width = 800;
+    static constexpr int width = 600;
     static constexpr int height = 600;
     static constexpr int channels = 3;
 
-    std::array<uint8_t, height * width * channels> image_buffer;
+    std::vector<uint8_t> image_buffer;
 
-    img();
+    img() : image_buffer(width * height * channels, 0) {}
 
     int draw_png(std::string filename, int width, int height, int channels,
                  void *data, int stride);

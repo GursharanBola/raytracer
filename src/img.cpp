@@ -11,8 +11,6 @@
  * This idea was takent from RIOW.
  */
 
-img::img() {}
-
 int img::draw_png(std::string filename, int width, int height, int channels,
                   void *data, int stride) {
     int png_truth =

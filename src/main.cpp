@@ -15,27 +15,32 @@ int main() {
         std::make_shared<lambertian>(vec3{0.8, 0.8, 0.0})));
 
     world.add(std::make_shared<sphere>(
-        vec3{0, 0.5, -3}, 1.0,
-        std::make_shared<metal>(vec3{0.9, 0.4, 0.1}, 0.2)));
+        vec3{-1.0, 1.5, 1.0}, 0.5,
+        std::make_shared<metal>(vec3{0.1, 0.3, 0.9}, 0.2))); // Blue
 
     world.add(std::make_shared<sphere>(
-        vec3{2.2, 0.5, -4}, 1.0,
-        std::make_shared<lambertian>(vec3{0.8, 0.8, 0.8})));
+        vec3{3.0, 1.5, 2.0}, 1.0,
+        std::make_shared<metal>(vec3{0.8, 0.8, 0.8}, 0.1))); // White
 
     world.add(std::make_shared<sphere>(
-        vec3{-2.2, 0.5, -3}, 1.0,
-        std::make_shared<lambertian>(vec3{0.2, 0.9, 0.2})));
-
-    world.add(std::make_shared<sphere>(
-        vec3{-0.8, 0.5, -1.5}, 0.5,
-        std::make_shared<lambertian>(vec3{0.1, 0.3, 0.9})));
+        vec3{2.8, 1.5, -0.8}, 1.0,
+        std::make_shared<lambertian>(vec3{0.2, 0.9, 0.2}))); // Green
 
     world.add(std::make_shared<sphere>(
         vec3{0, 0.5, -6}, 1.0,
         std::make_shared<lambertian>(vec3{1.0, 0.0, 1.0})));
 
+    world.add(std::make_shared<sphere>(
+        vec3{0.0, 1.2, 1.3}, 0.4,
+        std::make_shared<metal>(vec3{0.2, 0.9, 0.2}, 0.4))); // Green
+
+    // split
+    world.add(std::make_shared<sphere>(
+        vec3{0.0, 1.5, 2.8}, 0.5,
+        std::make_shared<metal>(vec3{0.9, 0.4, 0.1}, 0.0))); // Blue
+
     vec3 camera_center = vec3{0, 1.5, 2};
-    vec3 look_at = vec3{0, 0.5, -3};
+    vec3 look_at = vec3{0, 0.5, -3}; // Orientation reference
     vec3 cam_w = unit_vector(camera_center - look_at);
     vec3 cam_u = unit_vector(cross(vec3{0, 1, 0}, cam_w));
     vec3 cam_v = cross(cam_w, cam_u);
@@ -46,7 +51,7 @@ int main() {
                         cam_v, cam_w);
 
     img image;
-    int image_width = 800;
+    int image_width = 600;
     int image_height = 600;
     int color_channels = 3;
     int stride = image_width * color_channels;

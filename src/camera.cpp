@@ -56,8 +56,8 @@ void camera::render(const hittable_list &world, int image_width,
         // but can easily be updated to support any angular width but I
         // don't want to further clutter the already cluttered deceleration
         // for camera
-        double angular_width = pi / 6;  // phi direction
-        double angular_height = pi / 6; // theta direction
+        double angular_height = pi; // theta direction
+        double angular_width = pi;  // phi direction
 
         double delta_theta = 2 * angular_height / (image_height - 1);
         double delta_phi = 2 * angular_width / (image_width - 1);

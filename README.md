@@ -10,8 +10,11 @@ Currently I am working on optimizing the rendering loop on one core.
 In the future I will support single core optimization to the rendering loop. I hope to add some parallelism to this as well either with openMP (since it is more simple), but if I have more time this summer, then maybe using C++'s STD libraries for managing threads and mutex's. 
 
 
-If you want some images of a happy little sphere family with the three lens types here they are:
-
+If you want some images of a happy little sphere family with the three lens types here they are here:
+# Flat Camera
 ![Uh Oh](resources/render.png)
+# Spherical Camera
 ![Uh Oh](resources/render1.png)
+# FishEye Lens
 ![Uh Oh](resources/render2.png)
+Note this has alot of distortion since it "single sample" with no antialiasing. 
