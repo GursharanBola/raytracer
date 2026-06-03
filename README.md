@@ -12,6 +12,6 @@ In the future I will support single core optimization to the rendering loop. I h
 
 If you want some images of a happy little sphere family with the three lens types here they are:
 
-![Uh Oh](resources/render.xcf)
-![Uh Oh](resources/render1.xcf)
-![Uh Oh](resources/render2.xcf)
+![Uh Oh](resources/render.png)
+![Uh Oh](resources/render1.png)
+![Uh Oh](resources/render2.png)
