@@ -2,7 +2,7 @@
 #include "vec3.h"
 
 vec3 metal::bounce(const vec3 &hit_location, const vec3 &normal,
-                   const vec3 ray_direction, bool is_entering) const {
+                   const vec3 &ray_direction, bool is_entering) const {
     vec3 res;
     res = ray_direction - 2 * (dot(ray_direction, normal)) * normal;
 

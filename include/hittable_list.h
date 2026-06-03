@@ -40,9 +40,9 @@ class hittable_list : public hittable {
         bool did_hit = false;
 
         for (const auto &object : this->objects) {
-            if (object->hit(r, ray_tmin, closest_dist, rec)) {
+            if (object->hit(r, ray_tmin, closest_dist, temp_rec)) {
                 did_hit = true;
-                closest_dist = rec.t;
+                closest_dist = temp_rec.t;
 
                 rec = temp_rec;
             }

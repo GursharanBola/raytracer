@@ -2,7 +2,7 @@
 #include "vec3.h"
 
 vec3 lambertian::bounce(const vec3 &hit_location, const vec3 &normal,
-                        const vec3 ray_direction, bool is_entering) const {
+                        const vec3 &ray_direction, bool is_entering) const {
     int radius = 1;
     vec3 res = random_vec3(-radius, radius);
 

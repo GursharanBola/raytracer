@@ -40,13 +40,6 @@ class vec3 {
 
     double elem_sum(const vec3 v) { return v.vec[0] + v.vec[1] + v.vec[2]; }
 
-    vec3 cross(const vec3 &v1, const vec3 &v2) {
-        double i = v1.vec[1] * v2.vec[2] - v1.vec[2] * v2.vec[1];
-        double j = v1.vec[2] * v2.vec[0] - v1.vec[0] * v2.vec[2];
-        double k = v1.vec[0] * v2.vec[1] - v1.vec[1] * v2.vec[0];
-        return vec3(i, j, k);
-    }
-
     double length_squared() const {
         return this->vec[0] * this->vec[0] + this->vec[1] * this->vec[1] +
                this->vec[2] * this->vec[2];
@@ -124,6 +117,12 @@ inline vec3 rotate_horizontal(const vec3 &v, double phi) {
 
     return vec3(v.x() * cos_phi + v.z() * sin_phi, v.y(),
                 -v.x() * sin_phi + v.z() * cos_phi);
+}
+inline vec3 cross(const vec3 &v1, const vec3 &v2) {
+    double i = v1.vec[1] * v2.vec[2] - v1.vec[2] * v2.vec[1];
+    double j = v1.vec[2] * v2.vec[0] - v1.vec[0] * v2.vec[2];
+    double k = v1.vec[0] * v2.vec[1] - v1.vec[1] * v2.vec[0];
+    return vec3(i, j, k);
 }
 
 #endif

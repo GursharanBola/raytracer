@@ -11,7 +11,7 @@ raytracer.exe
 a.out
 .vscode/
 .idea/
-./build
+build/
 *.suo
 *.ntvs*
 *.njsproj

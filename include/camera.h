@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include "hittable_list.h"
-#include "material.h"
+#include "img.h"
 #include "vec3.h"
 #include <limits>
 
@@ -23,7 +23,8 @@ class camera {
           camera_type(type), focal_length(f_length), focal_dist(f_dist),
           t_max{tray_max}, t_min{tray_min} {}
 
-    void render(const hittable_list &world, int image_width, int image_height);
+    void render(const hittable_list &world, int image_width, int image_height,
+                img &image);
 
   private:
     vec3 center;
@@ -34,10 +35,10 @@ class camera {
     double focal_length;
     double pi = 3.1415926535897932;
     double focal_dist;
-    double aperture_radius = 0.5;
+    double aperture_radius = 0.00001;
     double t_max;
     double t_min;
-    int num_samples = 20; // number of antialiasing samples.
+    int num_samples = 50; // number of antialiasing samples.
     int depth = 10;
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi,

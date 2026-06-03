@@ -14,12 +14,9 @@
 // should stick to inputting image_width and img_height as it is hard coded
 // int the img headerfile.
 void camera::render(const hittable_list &world, int image_width,
-                    int image_height) {
-    img image = img{}; // create a width 800, height 600 image with 3 8 bit
-                       // channels.
-
+                    int image_height, img &image) {
     switch (camera_type) {
-    case CAMERA_SPHERICAL: {
+    case camera::CAMERA_SPHERICAL: {
         // NOTE: Theta is the vertical and phi is the horizontal.
         double delta_theta = pi / (image_height - 1);
         double delta_phi = (2 * pi) / (image_width - 1);
@@ -38,7 +35,7 @@ void camera::render(const hittable_list &world, int image_width,
         }
         break;
     }
-    case CAMERA_FLAT: {
+    case camera::CAMERA_FLAT: {
         double aspect_ratio = (double)image_width / image_height;
         for (int i = 0; i < image_height; i++) {
             for (int j = 0; j < image_width; j++) {
@@ -54,7 +51,7 @@ void camera::render(const hittable_list &world, int image_width,
         break;
     }
     // NOTE: Fisheye lenses support ONLY camera rotations.
-    case CAMERA_FISHEYE: {
+    case camera::CAMERA_FISHEYE: {
         // NOTE: Currently the angular width and height are hard coded
         // but can easily be updated to support any angular width but I
         // don't want to further clutter the already cluttered deceleration

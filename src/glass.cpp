@@ -2,7 +2,7 @@
 #include "vec3.h"
 
 vec3 glass::bounce(const vec3 &hit_location, const vec3 &normal,
-                   const vec3 ray_direction, bool is_entering) const {
+                   const vec3 &ray_direction, bool is_entering) const {
 
     double cos_theta = std::fmin(-dot(ray_direction, normal), 1.0);
     double eta_ratio = is_entering ? (1.0 / refrac_index) : refrac_index;
