@@ -16,5 +16,8 @@ If you want some images of a happy little sphere family with the three lens type
 # Spherical Camera
 ![Uh Oh](resources/render1.png)
 # FishEye Lens
-![Uh Oh](resources/render2.png)
-Note this has alot of distortion since it "single sample" with no antialiasing. 
+Note this has alot of distortion since it "single sample" with no antialiasing. \
+
+<p align="center">
+  <img src="resources/render2.png" alt="Uh Oh">
+</p> 
