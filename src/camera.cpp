@@ -50,55 +50,80 @@ void camera::render(const hittable_list &world, int image_width,
         }
         break;
     }
-    // NOTE: Fisheye lenses support ONLY camera rotations.
+        // NOTE: Fisheye lenses "require" the image be square to perfectly fit a
+        // cricle.
+
     case camera::CAMERA_FISHEYE: {
-        // NOTE: Currently the angular width and height are hard coded
-        // but can easily be updated to support any angular width but I
-        // don't want to further clutter the already cluttered deceleration
-        // for camera
-        double angular_height = pi; // theta direction
-        double angular_width = pi;  // phi direction
-
-        double delta_theta = 2 * angular_height / (image_height - 1);
-        double delta_phi = 2 * angular_width / (image_width - 1);
-
-        double cen_t = pi / 2;
-        double cen_p = pi;
-
+        double fisheye_radius = 1.0;
         for (int i = 0; i < image_height; i++) {
-            double theta = cen_t - angular_height + delta_theta * i;
-            double sin_theta = std::sin(theta);
-            double cos_theta = std::cos(theta);
             for (int j = 0; j < image_width; j++) {
-                double phi = cen_p - angular_width + delta_phi * j;
-                double sin_phi = std::sin(phi);
-                double cos_phi = std::cos(phi);
+                vec3 avg_color = average_pixel_fisheye(
+                    i, j, world, image_width, image_height, fisheye_radius);
 
-                vec3 local_dir =
-                    vec3(-sin_theta * sin_phi, cos_theta, -sin_theta * cos_phi);
+                bool valid = image.set_color(j, i, avg_color);
 
-                vec3 global_dir = (local_dir.x() * cam_u) +
-                                  (local_dir.y() * cam_v) -
-                                  (local_dir.z() * cam_w);
-
-                ray r = ray(center, unit_vector(global_dir));
-
-                vec3 single_color = color(r, world, depth);
-                single_color = gamma_correct(single_color);
-                bool valid = image.set_color(j, i, single_color);
                 if (!valid) {
                     throw std::runtime_error("Somehow failed to set color!");
                 }
             }
         }
-        break;
     }
     }
 }
 
+vec3 camera::average_pixel_fisheye(int i, int j, const hittable_list &world,
+                                   int image_width, int image_height,
+                                   double rad) const {
+    double aspect_ratio = (double)image_width / image_height;
+
+    thread_local static std::random_device rd;
+    thread_local static std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis(-0.5, 0.5);
+
+    vec3 avg_color = vec3{0, 0, 0};
+
+    for (int k = 0; k < num_samples; k++) {
+
+        double jit_i = i + dis(gen);
+        double jit_j = j + dis(gen);
+
+        double percent_x = jit_j / image_width;
+        double percent_y = jit_i / image_height;
+
+        double jit_screen_x = (2.0 * percent_x - 1.0) * aspect_ratio;
+        double jit_screen_y = -(2.0 * percent_y - 1.0);
+
+        double x_sq = jit_screen_x * jit_screen_x;
+        double y_sq = jit_screen_y * jit_screen_y;
+        double rad_sq = rad * rad;
+
+        double dist = x_sq + y_sq;
+
+        if (dist > rad_sq) {
+            continue; // don't add anything to the color
+        }
+
+        double ref_theta = std::sqrt(dist) / focal_dist;
+        double ref_phi = std::atan2(jit_screen_y, jit_screen_x);
+
+        double dx = std::sin(ref_theta) * std::cos(ref_phi);
+        double dy = std::sin(ref_theta) * std::sin(ref_phi);
+        double dz = std::cos(ref_theta);
+
+        // dx, dy, and dz are in local space.
+        vec3 global_dir = (dx * cam_u) + (dy * cam_v) - (dz * cam_w);
+
+        ray r = ray(center, global_dir);
+
+        vec3 sample_color = color(r, world, depth);
+
+        avg_color += sample_color;
+    }
+    return gamma_correct(avg_color / num_samples);
+}
+
 // NOTE: This is supporting anti-aliasing and works for spherical lenses
 // That CAN be rotated. Bokeh is not supported for spherical lenses.
-
 vec3 camera::average_pixel_angular(int i, int j, double delta_theta,
                                    double delta_phi,
                                    const hittable_list &world) const {

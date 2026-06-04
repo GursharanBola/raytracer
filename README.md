@@ -12,11 +12,21 @@ In the future I will support single core optimization to the rendering loop. I h
 
 If you want some images of a happy little sphere family with the three lens types here they are here:
 # Flat Camera
-![Uh Oh](resources/render.png)
+Cute little family
+
+<p align="center">
+  <img src="resources/render.png" alt="Uh Oh">
+</p> 
+
 # Spherical Camera
-![Uh Oh](resources/render1.png)
+Notice the wrap around! That Sphere is BEHIND the camera.
+
+<p align="center">
+  <img src="resources/render1.png" alt="Uh Oh">
+</p> 
+
 # FishEye Lens
-Note this has alot of distortion since it "single sample" with no antialiasing. 
+Album Cover for The Spheres 
 
 <p align="center">
   <img src="resources/render2.png" alt="Uh Oh">

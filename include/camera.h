@@ -38,14 +38,18 @@ class camera {
     double aperture_radius = 0.00001;
     double t_max;
     double t_min;
-    int num_samples = 500; // number of antialiasing samples.
-    int depth = 20;
+    int num_samples = 300; // number of antialiasing samples.
+    int depth = 10;
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi,
                                const hittable_list &world) const;
 
     vec3 average_pixel_linear(int i, int j, const hittable_list &world,
                               int image_width, int image_height) const;
+
+    vec3 average_pixel_fisheye(int i, int j, const hittable_list &world,
+                               int image_width, int image_height,
+                               double rad) const;
 
     vec3 color(const ray &r, const hittable_list &world, int depth) const;
     vec3 gamma_correct(const vec3 &color) const;

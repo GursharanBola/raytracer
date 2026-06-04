@@ -3,6 +3,7 @@ project(raytracer)
 
 include_directories(include external)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCES
     src/camera.cpp
     src/glass.cpp

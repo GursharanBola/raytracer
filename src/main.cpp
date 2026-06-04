@@ -40,15 +40,16 @@ int main() {
         std::make_shared<metal>(vec3{0.9, 0.4, 0.1}, 0.0))); // Blue
 
     vec3 camera_center = vec3{0, 1.5, 2};
-    vec3 look_at = vec3{0, 0.5, -3}; // Orientation reference
+    vec3 look_at = vec3{0, 0.5, -3};
     vec3 cam_w = unit_vector(camera_center - look_at);
     vec3 cam_u = unit_vector(cross(vec3{0, 1, 0}, cam_w));
     vec3 cam_v = cross(cam_w, cam_u);
-    double focal_dist = (camera_center - look_at).length();
 
-    camera cam = camera(camera_center, camera::CAMERA_FISHEYE, focal_dist,
-                        std::numeric_limits<double>::max(), 0.001, 1.0, cam_u,
-                        cam_v, cam_w);
+    double fisheye_focal_length = 2.0 / 3.14159265358979323846;
+
+    camera cam = camera(
+        camera_center, camera::CAMERA_FISHEYE, fisheye_focal_length,
+        std::numeric_limits<double>::max(), 0.001, 1.0, cam_u, cam_v, cam_w);
 
     img image;
     int image_width = 600;
