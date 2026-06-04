@@ -16,7 +16,7 @@ int main() {
 
     world.add(std::make_shared<sphere>(
         vec3{-1.0, 1.5, 1.0}, 0.5,
-        std::make_shared<metal>(vec3{0.1, 0.3, 0.9}, 0.2))); // Blue
+        std::make_shared<light>(vec3{2.0, 6.0, 18.0})));
 
     world.add(std::make_shared<sphere>(
         vec3{3.0, 1.5, 2.0}, 1.0,
@@ -32,7 +32,7 @@ int main() {
 
     world.add(std::make_shared<sphere>(
         vec3{0.0, 1.2, 1.3}, 0.4,
-        std::make_shared<metal>(vec3{0.2, 0.9, 0.2}, 0.4))); // Green
+        std::make_shared<glass>(vec3{0.2, 0.9, 0.2}, 1.5))); // Green
 
     // split
     world.add(std::make_shared<sphere>(

@@ -25,7 +25,7 @@ Notice the wrap around! That Sphere is BEHIND the camera.
   <img src="resources/render1.png" alt="Uh Oh">
 </p> 
 
-# FishEye Lens
+# Fisheye Lens
 Album Cover for The Spheres 
 
 <p align="center">

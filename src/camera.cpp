@@ -248,7 +248,9 @@ vec3 camera::color(const ray &r, const hittable_list &world, int depth) const {
 
         double normalized_y = 0.5 * (u_dir.y() + 1.0);
 
-        return (1 - normalized_y) * white + light_blue * normalized_y;
+        return vec3{0, 0, 0};
+        // NOTE: If you want the sky back uncomment this line
+        // return (1 - normalized_y) * white + light_blue * normalized_y;
     }
     // Terminate early if we hit a light.
     if (rec.mat->is_light()) {
