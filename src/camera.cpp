@@ -196,6 +196,7 @@ vec3 camera::average_pixel_linear(int i, int j, const hittable_list &world,
         double jit_screen_x = (2.0 * percent_x - 1.0) * aspect_ratio;
         double jit_screen_y = -(2.0 * percent_y - 1.0);
 
+        // TODO: Next to verify if working.
         // NOTE: Bokeh vvv
         vec3 random_unit_disk = random_vec3(-aperture_radius, aperture_radius);
         random_unit_disk.vec[2] = 0;
@@ -248,9 +249,7 @@ vec3 camera::color(const ray &r, const hittable_list &world, int depth) const {
 
         double normalized_y = 0.5 * (u_dir.y() + 1.0);
 
-        return vec3{0, 0, 0};
-        // NOTE: If you want the sky back uncomment this line
-        // return (1 - normalized_y) * white + light_blue * normalized_y;
+        return (1 - normalized_y) * white + light_blue * normalized_y;
     }
     // Terminate early if we hit a light.
     if (rec.mat->is_light()) {

@@ -35,10 +35,10 @@ class camera {
     double focal_length;
     double pi = 3.1415926535897932;
     double focal_dist;
-    double aperture_radius = 0.00001;
+    double aperture_radius = 0.02;
     double t_max;
     double t_min;
-    int num_samples = 700; // number of antialiasing samples.
+    int num_samples = 50; // number of antialiasing samples.
     int depth = 10;
     vec3 average_pixel_angular(int i, int j, double delta_theta,
                                double delta_phi,

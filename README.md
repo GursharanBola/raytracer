@@ -26,8 +26,15 @@ Notice the wrap around! That Sphere is BEHIND the camera.
 </p> 
 
 # Fisheye Lens
-Album Covers for The Spheres 
+Album cover for The Spheres 
 
 <p align="center">
   <img src="resources/render2.png" alt="Uh Oh">
+</p> 
+
+# Depth Of Field
+Spheres all lined up!
+
+<p align="center">
+  <img src="resources/render4.png" alt="Uh Oh">
 </p> 
