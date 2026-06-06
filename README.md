@@ -5,7 +5,7 @@ The project supports antialiasing, camera roll pitch yaw and translation, glass,
 
 Currently I am working on optimizing the rendering loop on one core. 
 
-In the future I hope to add some parallelism to this as well either with openMP (since it is more simple), but if I have more time this summer, then maybe using C++'s STD libraries for managing threads and mutex's. 
+In the future I hope to add some parallelism either with openMP (since it is more simple), but if I have more time this summer, using C++'s STD libraries for managing threads and mutex's. 
 
 # Flat Camera
 Cute little family
