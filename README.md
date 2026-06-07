@@ -1,5 +1,5 @@
 This is a raytracer that I am building it is kind of a running project and will add things that I think are interesting. Some of the techniques that I use are original (see source code!)
-and some of them are taken from approaches seen in The Blog At The Bottom of The Sea (methods for calculating depth of field) and Ray Tracing In One Weekend (hittable and hittable_list design, math for surface different materials).
+and some of them are taken from approaches seen in The Blog At The Bottom of The Sea (methods for calculating depth of field) and Ray Tracing In One Weekend (hittable and hittable_list design, math for surface different materials). This is not a complete list but both Peter Shirley and my implementations are public so feel free to compare the two!
 
 The project supports antialiasing, camera roll pitch yaw and translation, glass, matte, and metal surfaces, and lighting. The project also supports fisheye lenses, spherical sensors, and flat sensors with depth of field.
 
