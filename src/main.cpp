@@ -11,38 +11,53 @@ int main() {
     hittable_list world;
 
     world.add(std::make_shared<sphere>(
-        vec3{0, -100.5, -1}, 100,
-        std::make_shared<lambertian>(vec3{0.5, 0.5, 0.5})));
+        vec3{0, -100.5, -3}, 100,
+        std::make_shared<lambertian>(vec3{0.8, 0.8, 0.0})));
+
+    world.add(
+        std::make_shared<sphere>(vec3{-2.0, 2.0, -2.0}, 0.5,
+                                 std::make_shared<light>(vec3{1.0, 1.0, 1.0})));
 
     world.add(std::make_shared<sphere>(
-        vec3{-1.2, 0, -1.0}, 0.5,
-        std::make_shared<lambertian>(vec3{0.7, 0.3, 0.3})));
-    world.add(std::make_shared<sphere>(
-        vec3{0.0, 0, -2.0}, 0.5,
-        std::make_shared<lambertian>(vec3{0.3, 0.7, 0.3})));
-    world.add(std::make_shared<sphere>(
-        vec3{1.2, 0, -3.0}, 0.5,
-        std::make_shared<lambertian>(vec3{0.3, 0.3, 0.7})));
+        vec3{3.0, 1.5, 2.0}, 1.0,
+        std::make_shared<metal>(vec3{0.8, 0.8, 0.8}, 0.1))); // White
 
-    vec3 camera_center = vec3{0, 0, 0};
-    vec3 look_at = vec3{0, 0, -2};
+    world.add(std::make_shared<sphere>(
+        vec3{2.8, 1.5, -0.8}, 1.0,
+        std::make_shared<lambertian>(vec3{0.1, 0.9, 0.1}))); // Green
+
+    world.add(std::make_shared<sphere>(
+        vec3{0, 0.5, -6}, 1.0,
+        std::make_shared<lambertian>(vec3{1.0, 0.0, 1.0})));
+
+    world.add(std::make_shared<sphere>(
+        vec3{0.0, 1.2, 1.3}, 0.4,
+        std::make_shared<glass>(vec3{0.2, 0.9, 0.2}, 1.5))); // Green
+
+    // split
+    world.add(std::make_shared<sphere>(
+        vec3{0.0, 1.5, 2.8}, 0.5,
+        std::make_shared<metal>(vec3{0.9, 0.4, 0.1}, 0.0))); // Blue
+
+    vec3 camera_center = vec3{0, 1.5, 2};
+    vec3 look_at = vec3{0, 0.5, -3};
     vec3 cam_w = unit_vector(camera_center - look_at);
     vec3 cam_u = unit_vector(cross(vec3{0, 1, 0}, cam_w));
     vec3 cam_v = cross(cam_w, cam_u);
 
-    double f_length = 2.0;
-    double focus_dist = (vec3{0, 0, -2} - camera_center).length();
+    double fisheye_focal_length = 2.0 / 3.14159265358979323846;
 
-    camera cam = camera(camera_center, camera::CAMERA_FLAT, focus_dist,
-                        std::numeric_limits<double>::max(), 0.001, f_length,
-                        cam_u, cam_v, cam_w);
+    double focus_dist = (camera_center - look_at).length() - 0.6668;
+
+    camera cam =
+        camera(camera_center, camera::CAMERA_FLAT, fisheye_focal_length,
+               focus_dist, 0.001, 1.0, cam_u, cam_v, cam_w);
 
     img image;
-    int image_width = 800;
+    int image_width = 600;
     int image_height = 600;
-
     int color_channels = 3;
-    int stride = color_channels * image_width;
+    int stride = image_width * color_channels;
 
     cam.render(world, image_width, image_height, image);
 

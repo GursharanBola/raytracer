@@ -34,3 +34,10 @@ Spheres all lined up!
 <p align="center">
   <img src="resources/render4.png" alt="Uh Oh">
 </p> 
+
+Depth of Field of The Spheres
+
+<p align="center">
+  <img src="resources/render5.png" alt="Uh Oh">
+</p> 
+
